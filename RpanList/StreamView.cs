@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using RpanList.Classes;
+using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using RpanList.Classes;
 
 namespace RpanList
 {
@@ -119,7 +115,10 @@ namespace RpanList
                 TextAlignment = TextAlignment.Center
             };
 
-            if (data.downvotes > data.upvotes) netVotes.Foreground = new SolidColorBrush(Color.FromRgb(0, 90, 255));
+            if (data.downvotes > data.upvotes)
+            {
+                netVotes.Foreground = new SolidColorBrush(Color.FromRgb(0, 90, 255));
+            }
 
             BitmapImage bitmap = new BitmapImage();
             bitmap.BeginInit();

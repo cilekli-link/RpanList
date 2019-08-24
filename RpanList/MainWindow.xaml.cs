@@ -1,23 +1,9 @@
 ﻿using Newtonsoft.Json;
 using RpanList.Classes;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RpanList
 {
@@ -32,7 +18,6 @@ namespace RpanList
         {
             InitializeComponent();
             ApiResponse apiResponse;
-            string s;
             HttpClientHandler handler = new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
@@ -45,7 +30,7 @@ namespace RpanList
                 {
                     response = client.GetAsync("videos/seed/360").Result;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     MessageBox.Show("Could not connect to RPAN API.");
                     return;
