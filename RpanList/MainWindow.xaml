@@ -8,7 +8,10 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid Height="25" VerticalAlignment="Top" Background="#FF006380">
-            <TextBlock Name="status" VerticalAlignment="Center" Text="RPAN: Could not connect" Foreground="White" Margin="5,0,0,0"/>
+            <TextBlock Width="250" HorizontalAlignment="Left" Name="status" VerticalAlignment="Center" Text="RPAN: Could not connect" Foreground="White" Margin="5,0,0,0"/>
+            <WrapPanel Width="500" HorizontalAlignment="Right" Name="actions">
+                
+            </WrapPanel>
         </Grid>
         <ScrollViewer Margin="0,25,0,0">
             <StackPanel Name="StreamList" Background="Black" >
