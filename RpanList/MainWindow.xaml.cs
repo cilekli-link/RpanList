@@ -75,6 +75,7 @@ namespace RpanList
                         if (rpanDown.Visibility == Visibility.Visible) // if already in RpanError, update the header and rotate the pan
                         {
                             tbRpanDown.Text = "RPAN is still down";
+                            tbRefresh.Text = "Click here to refresh again";
                             panRotation += 5;
                             tbBrokenPan.RenderTransform = new RotateTransform(panRotation);
                             break;
