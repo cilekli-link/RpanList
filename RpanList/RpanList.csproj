@@ -110,5 +110,8 @@
     <Resource Include="Icons\link.png" />
     <Resource Include="Icons\open.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\brokenPan.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
