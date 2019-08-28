@@ -126,13 +126,13 @@ namespace RpanList
             if (!isRefreshing)
             {
                 isRefreshing = true;
-                BackgroundWorker refreshbw = new BackgroundWorker();
-                refreshbw.DoWork += new DoWorkEventHandler(_asyncSpeakerThread_DoWork);
-                refreshbw.RunWorkerAsync();
+                BackgroundWorker refresh = new BackgroundWorker();
+                refresh.DoWork += new DoWorkEventHandler(Refresh_DoWork);
+                refresh.RunWorkerAsync();
             }
         }
 
-        void _asyncSpeakerThread_DoWork(object sender, DoWorkEventArgs e)
+        void Refresh_DoWork(object sender, DoWorkEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() => { tbRefresh.Text = "Refreshing..."; }));
             Dispatcher.BeginInvoke(new Action(() => { parseResponse(grabResponse()); }));
