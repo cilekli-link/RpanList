@@ -72,7 +72,7 @@ namespace RpanList
 
                     if (response.data.Count == 0) // response contains no streams (usually means that RPAN has ended for today)
                     {
-                        if (rpanDown.Visibility == Visibility.Visible && tbRpanDown.Text == "RPAN is down") // if already in RpanError, update the header and rotate the pan
+                        if (rpanDown.Visibility == Visibility.Visible) // if already in RpanError, update the header and rotate the pan
                         {
                             tbRpanDown.Text = "RPAN is still down";
                             panRotation += 5;
