@@ -52,7 +52,7 @@ namespace RpanList
             }
             catch (Exception)
             {
-                return new ApiResponse { status = "JSON died lol" }; // sorry for this
+                return new ApiResponse { status = "Couldn't parse JSON" };
             }
         }
 
@@ -98,7 +98,7 @@ namespace RpanList
 
                 }
                 else if (response.status == "Couldn't connect") throwError("Could not connect to RPAN API.");
-                else if (response.status == "JSON died lol") throwError("Could not understand RPAN API response. (Is RPAN fully dead?...)");
+                else if (response.status == "Couldn't parse JSON") throwError("Could not understand RPAN API response. (Is RPAN fully dead?...)");
                 else throwError("RPAN API returned with error: " + response.status);
                 tbRefresh.Text = "Could not refresh";
             }
