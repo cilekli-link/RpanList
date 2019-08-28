@@ -9,9 +9,6 @@ using System.Windows.Media;
 
 namespace RpanList
 {
-    /// <summary>
-    /// MainWindow.xaml etkileşim mantığı
-    /// </summary>
     public partial class MainWindow : Window
     {
         // Set to true after clicking refresh on RpanDown grid
