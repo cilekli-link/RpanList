@@ -12,7 +12,7 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" FontSize="14" Text="Search for streams..."/>
+            <TextBox Name="tbSearch" GotFocus="TbSearch_GotFocus" LostFocus="TbSearch_LostFocus" Grid.Column="0" FontSize="14" Text="Search for streams..."/>
             <WrapPanel Grid.Column="1" Width="400" FlowDirection="RightToLeft" HorizontalAlignment="Right" Name="actions">
                 <Grid Height="25">
                     <TextBlock Name="tbRefresh2" Foreground="White" Text="Refresh" Margin="24,5,0,0" HorizontalAlignment="Right"/>

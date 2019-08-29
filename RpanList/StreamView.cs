@@ -10,12 +10,34 @@ namespace RpanList
 {
     class StreamView : Grid
     {
+        RpanData rpanData;
+
         FlatButton openRpan = new FlatButton("Open in RPAN", 80, @"Icons\open.png", Color.FromRgb(0, 50, 255));
         FlatButton openRpanMedia = new FlatButton("Open in r/pan_media", 137, @"Icons\link.png", Color.FromRgb(255, 100, 0));
         FlatButton download = new FlatButton("Download", 50, @"Icons\download.png", Color.FromRgb(0, 150, 255));
 
+        public void SearchTermChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (!string.IsNullOrWhiteSpace(tb.Text))
+            {
+                string term = tb.Text.ToLowerInvariant();
+                string title = rpanData.post.title.ToLowerInvariant();
+                string user = rpanData.post.authorInfo.name.ToLowerInvariant();
+                if (title.Contains(term) || user.Contains(term))
+                {
+                    Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    Visibility = Visibility.Collapsed;
+                }
+            }
+        }
         public StreamView(RpanData data)
         {
+            rpanData = data;
+            #region UI elements
             Background = new SolidColorBrush(Color.FromRgb(24, 24, 24));
             Height = 80;
             Margin = new Thickness(10, 5, 10, 0);
@@ -114,6 +136,7 @@ namespace RpanList
                 FontSize = 14,
                 TextAlignment = TextAlignment.Center
             };
+            #endregion
 
             if (data.downvotes > data.upvotes)
             {

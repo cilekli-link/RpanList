@@ -7,12 +7,14 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using WinForms = System.Windows.Forms;
 using conf = RpanList.Properties.Settings;
+using System.Windows.Threading;
 
 namespace RpanList
 {
     public partial class MainWindow : Window
     {
         BackgroundWorker refresh = new BackgroundWorker();
+        DispatcherTimer periodicRefresh = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
 
         // Set to true after clicking refresh on RpanDown grid
         bool isRefreshing;
@@ -32,8 +34,14 @@ namespace RpanList
         {
             refresh.DoWork += new DoWorkEventHandler(Refresh_DoWork);
             InitializeComponent();
+            periodicRefresh.Tick += PeriodicRefresh_Tick;
             retrieveSettings(conf.Default);
             parseResponse(RpanApi.grabResponse());
+        }
+
+        private void PeriodicRefresh_Tick(object sender, EventArgs e)
+        {
+            if (!refresh.IsBusy) refresh.RunWorkerAsync();
         }
 
         void parseResponse(ApiResponse response)
@@ -87,6 +95,7 @@ namespace RpanList
                         tbRefresh2.Text = "Refresh";
                         listStreams(response);
                         rpanDown.Visibility = Visibility.Collapsed;
+                        if (!periodicRefresh.IsEnabled) periodicRefresh.Start();
                         break;
                     }
 
@@ -119,11 +128,15 @@ namespace RpanList
         {
             double vo = scroller.VerticalOffset;
             StreamList.Children.Clear();
+            streams = 0;
+            views = 0;
             foreach (RpanData data in response.data)
             {
                 streams++;
                 views = views + data.continuous_watchers;
-                StreamList.Children.Add(new StreamView(data));
+                StreamView sw = new StreamView(data);
+                tbSearch.TextChanged += sw.SearchTermChanged;
+                StreamList.Children.Add(sw);
             }
             scroller.ScrollToVerticalOffset(vo);
             scroller.UpdateLayout();
@@ -241,6 +254,16 @@ namespace RpanList
         {
             tbYtdlPath.Text = s.ytdlPath;
             tbDownloadDir.Text = s.downloadDir;
+        }
+
+        private void TbSearch_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (tbSearch.Text == "Search for streams...") tbSearch.Text = "";
+        }
+
+        private void TbSearch_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(tbSearch.Text)) tbSearch.Text = "Search for streams...";
         }
     }
 }
