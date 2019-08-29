@@ -8,12 +8,13 @@ using System.Windows.Media;
 using WinForms = System.Windows.Forms;
 using conf = RpanList.Properties.Settings;
 using System.Windows.Threading;
+using System.Threading.Tasks;
 
 namespace RpanList
 {
     public partial class MainWindow : Window
     {
-        BackgroundWorker refresh = new BackgroundWorker();
+        //BackgroundWorker refresh = new BackgroundWorker();
         DispatcherTimer periodicRefresh = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
 
         // Set to true after clicking refresh on RpanDown grid
@@ -32,20 +33,20 @@ namespace RpanList
 
         public MainWindow()
         {
-            refresh.DoWork += new DoWorkEventHandler(Refresh_DoWork);
             InitializeComponent();
             periodicRefresh.Tick += PeriodicRefresh_Tick;
             retrieveSettings(conf.Default);
-            parseResponse(RpanApi.grabResponse());
+            parseResponse();
         }
 
         private void PeriodicRefresh_Tick(object sender, EventArgs e)
         {
-            if (!refresh.IsBusy) refresh.RunWorkerAsync();
+            refresh();
         }
 
-        void parseResponse(ApiResponse response)
+        async void parseResponse()
         {
+            ApiResponse response = RpanApi.grabResponse();
             int retryLimit = 3;
             for (int i = 0; i < retryLimit; i++)
             {
@@ -55,7 +56,7 @@ namespace RpanList
                     // it seems to get resolved if you retry a lot
                     // sorry for the awful workaround, but hey, it works
                     retryLimit = 20;
-                    System.Threading.Thread.Sleep(150);
+                    await Task.Delay(200);
                     if (i + 1 >= retryLimit)
                     {
                         isRefreshing = false;
@@ -149,15 +150,15 @@ namespace RpanList
             if (!isRefreshing)
             {
                 isRefreshing = true;
-                refresh.RunWorkerAsync();
+                refresh();
             }
         }
 
-        void Refresh_DoWork(object sender, DoWorkEventArgs e)
+        async void refresh()
         {
-            Dispatcher.BeginInvoke(new Action(() => { tbRefresh.Text = "Refreshing..."; }));
-            Dispatcher.BeginInvoke(new Action(() => { tbRefresh2.Text = "Refreshing"; }));
-            Dispatcher.BeginInvoke(new Action(() => { parseResponse(RpanApi.grabResponse()); }));
+           tbRefresh.Text = "Refreshing...";
+           tbRefresh2.Text = "Refreshing";
+           parseResponse();
         }
 
         private void TbReturn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -178,7 +179,7 @@ namespace RpanList
                 }
                 imRefresh.RenderTransform = new RotateTransform(refreshRotation);
 
-                refresh.RunWorkerAsync();
+                refresh();
             }
         }
 
