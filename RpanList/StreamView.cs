@@ -80,7 +80,7 @@ namespace RpanList
 
             openRpan.Click += (s, a) => { Process.Start("https://reddit.com" + data.share_link); };
             openRpanMedia.Click += (s, a) => { Process.Start("https://reddit.com" + data.post.permalink); };
-            download.Click += (s, a) => { Process.Start(@"C:\ytdl", "-f best " + data.stream.hls_url); };
+            download.Click += (s, a) => { Process.Start(Properties.Settings.Default.ytdlPath, "-o \"" + Properties.Settings.Default.downloadDir + data.post.title + ".mp4\"" + " -f best " + data.stream.hls_url); };
 
             StackPanel votes = new StackPanel
             {

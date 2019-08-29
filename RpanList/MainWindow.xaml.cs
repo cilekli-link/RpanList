@@ -1,8 +1,12 @@
-﻿using RpanList.Classes;
+﻿using Microsoft.Win32;
+using RpanList.Classes;
 using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
+using WinForms = System.Windows.Forms;
+using conf = RpanList.Properties.Settings;
 
 namespace RpanList
 {
@@ -28,6 +32,7 @@ namespace RpanList
         {
             refresh.DoWork += new DoWorkEventHandler(Refresh_DoWork);
             InitializeComponent();
+            retrieveSettings(conf.Default);
             parseResponse(RpanApi.grabResponse());
         }
 
@@ -106,7 +111,7 @@ namespace RpanList
 
         void throwError(string errorMessage)
         {
-            MessageBox.Show(errorMessage);
+            System.Windows.MessageBox.Show(errorMessage);
         }
 
         void listStreams(ApiResponse response)
@@ -155,6 +160,80 @@ namespace RpanList
 
                 imRefresh.RenderTransform = new RotateTransform(refreshRotation);
             }
+        }
+
+        void openBrowse(BrowseType type)
+        {
+            switch (type)
+            {
+                case BrowseType.YoutubeDl:
+                    Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
+                    ofd.Title = "Open youtube-dl";
+                    ofd.Filter = "Application (*.exe)|*.exe|All files (*.*)|*.*";
+                    if (ofd.ShowDialog() == true && !string.IsNullOrWhiteSpace(ofd.FileName))
+                    {
+                        conf.Default.ytdlPath = ofd.FileName;
+                        conf.Default.Save();
+                        tbYtdlPath.Text = conf.Default.ytdlPath;
+                    }
+                    break;
+                case BrowseType.Downloads:
+                    FolderBrowserDialog fbd = new FolderBrowserDialog();
+                    fbd.Description = "Please select the folder where downloaded streams will be saved to.";
+                    if (fbd.ShowDialog() == WinForms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                    {
+                        conf.Default.downloadDir = fbd.SelectedPath;
+                        conf.Default.Save();
+                        tbDownloadDir.Text = conf.Default.downloadDir;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        enum BrowseType
+        {
+            YoutubeDl,
+            Downloads
+        }
+
+        private void BtnBrowseYtdl_Click(object sender, RoutedEventArgs e)
+        {
+            openBrowse(BrowseType.YoutubeDl);
+        }
+
+        private void BtnBrowseDownDir_Click(object sender, RoutedEventArgs e)
+        {
+            openBrowse(BrowseType.Downloads);
+        }
+
+        private void TbYtdlPath_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            conf.Default.ytdlPath = tbYtdlPath.Text;
+            conf.Default.Save();
+        }
+
+        private void TbDownloadDir_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            conf.Default.downloadDir = tbDownloadDir.Text;
+            conf.Default.Save();
+        }
+
+        private void TbCloseSettings_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            settingsGrid.Visibility = Visibility.Collapsed;
+        }
+
+        private void CbSettings_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            settingsGrid.Visibility = Visibility.Visible;
+        }
+
+        void retrieveSettings(conf s)
+        {
+            tbYtdlPath.Text = s.ytdlPath;
+            tbDownloadDir.Text = s.downloadDir;
         }
     }
 }

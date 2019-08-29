@@ -12,12 +12,17 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Text="Search for streams..."/>
+            <TextBox Grid.Column="0" FontSize="14" Text="Search for streams..."/>
             <WrapPanel Grid.Column="1" Width="400" FlowDirection="RightToLeft" HorizontalAlignment="Right" Name="actions">
                 <Grid Height="25">
-                    <Image Name="imRefresh" Width="18" Height="18"  Source="Icons\refresh.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0" RenderTransformOrigin="0.5,0.5"/>
                     <TextBlock Name="tbRefresh2" Foreground="White" Text="Refresh" Margin="24,5,0,0" HorizontalAlignment="Right"/>
+                    <Image Name="imRefresh" Width="18" Height="18"  Source="Icons\refresh.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0"/>
                     <Grid Name="cbRefresh" MouseLeftButtonUp="CbRefresh_MouseLeftButtonUp" Background="#00000000"/>
+                </Grid>
+                <Grid Height="25" Margin="5,0,0,0">
+                    <TextBlock Foreground="White" Text="Settings" Margin="24,5,0,0" HorizontalAlignment="Right"/>
+                    <Image Name="imSettings"  Width="18" Height="18"  Source="Icons\config.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                    <Grid Name="cbSettings" MouseLeftButtonUp="CbSettings_MouseLeftButtonUp" Background="#00000000"/>
                 </Grid>
             </WrapPanel>
         </Grid>
@@ -53,13 +58,30 @@
             </StackPanel>
         </ScrollViewer>
         <Grid Visibility="Collapsed" Name="rpanDown" Background="White">
-            <StackPanel Margin="0">
+            <StackPanel>
                 <Image Name="tbBrokenPan" Source="Icons\brokenPan.png" Height="150" Margin="0,30,0,0"/>
                 <TextBlock Name="tbRpanDown" Text="RPAN is down" FontSize="36" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,0"/>
                 <TextBlock Text="(API returned with success, but the stream list was empty)" FontSize="12" TextAlignment="Center" Margin="0,-4,0,-5"/>
                 <TextBlock Text="Please come back tomorrow." FontSize="20" TextAlignment="Center" Margin="0,5,0,0"/>
                 <TextBlock Name="tbRefresh" MouseLeftButtonUp="TbRefresh_MouseLeftButtonUp" Text="Refresh" FontSize="16" Foreground="#FF00AEFF" FontWeight="Bold" TextAlignment="Center" Margin="0,15,0,0"/>
                 <TextBlock Name="tbReturn" MouseLeftButtonUp="TbReturn_MouseLeftButtonUp"  Text="Ignore" FontSize="16" Foreground="#FFFF5100" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,0"/>
+            </StackPanel>
+        </Grid>
+        <Grid Name="settingsGrid" Visibility="Hidden" Background="#F2181818" Height="300" VerticalAlignment="Top" >
+            <TextBlock Text="Settings" Foreground="White" Margin="15,10,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Name="tbCloseSettings" MouseLeftButtonUp="TbCloseSettings_MouseLeftButtonUp" Text="Close" Foreground="#FFFF7676" Margin="0,10,15,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="17,50,0,0">
+                <TextBlock Text="Paths" Foreground="#FFFF9700" FontWeight="Bold" Margin="0,0,0,2" FontSize="14"/>
+                <WrapPanel>
+                    <TextBlock Text="Path to youtube-dl:" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBox Name="tbYtdlPath" TextChanged="TbYtdlPath_TextChanged" Width="200" Margin="0,0,5,0"/>
+                    <Button Name="btnBrowseYtdl" Content="Browse" Width="55" Click="BtnBrowseYtdl_Click"/>
+                </WrapPanel>
+                <WrapPanel>
+                    <TextBlock Text="Downloads folder:" Foreground="White" Margin="0,0,16,0"/>
+                    <TextBox Name="tbDownloadDir" TextChanged="TbDownloadDir_TextChanged" Width="200" Margin="0,0,5,0"/>
+                    <Button Name="btnBrowseDownDir" Click="BtnBrowseDownDir_Click" Content="Browse" Width="55"/>
+                </WrapPanel>
             </StackPanel>
         </Grid>
     </Grid>
