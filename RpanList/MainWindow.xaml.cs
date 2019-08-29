@@ -44,7 +44,7 @@ namespace RpanList
             refresh();
         }
 
-        async void parseResponse()
+        async Task parseResponse()
         {
             ApiResponse response = RpanApi.grabResponse();
             int retryLimit = 3;
@@ -158,7 +158,7 @@ namespace RpanList
         {
            tbRefresh.Text = "Refreshing...";
            tbRefresh2.Text = "Refreshing";
-           parseResponse();
+           await parseResponse();
         }
 
         private void TbReturn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
