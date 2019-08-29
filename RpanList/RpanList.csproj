@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\RpanApi.cs" />
     <Compile Include="FlatButton.cs" />
     <Compile Include="StreamView.cs" />
     <Page Include="MainWindow.xaml">
@@ -112,6 +113,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\brokenPan.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\refresh.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -2,7 +2,7 @@
 
 namespace RpanList.Classes
 {
-    class ApiResponse
+    public class ApiResponse
     {
         public string status;
         public List<RpanData> data;

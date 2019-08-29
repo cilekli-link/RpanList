@@ -8,8 +8,17 @@
         Title="RpanList - not connected yet" Height="450" Width="800">
     <Grid>
         <Grid Height="25" VerticalAlignment="Top" Background="#FF006380">
-            <WrapPanel Width="500" HorizontalAlignment="Right" Name="actions">
-
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="Search for streams..."/>
+            <WrapPanel Grid.Column="1" Width="400" FlowDirection="RightToLeft" HorizontalAlignment="Right" Name="actions">
+                <Grid Height="25">
+                    <Image Name="imRefresh" Width="18" Height="18"  Source="Icons\refresh.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0" RenderTransformOrigin="0.5,0.5"/>
+                    <TextBlock Name="tbRefresh2" Foreground="White" Text="Refresh" Margin="24,5,0,0" HorizontalAlignment="Right"/>
+                    <Grid Name="cbRefresh" MouseLeftButtonUp="CbRefresh_MouseLeftButtonUp" Background="#00000000"/>
+                </Grid>
             </WrapPanel>
         </Grid>
         <ScrollViewer Margin="0,25,0,0">
@@ -48,8 +57,9 @@
                 <Image Name="tbBrokenPan" Source="Icons\brokenPan.png" Height="150" Margin="0,30,0,0"/>
                 <TextBlock Name="tbRpanDown" Text="RPAN is down" FontSize="36" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,0"/>
                 <TextBlock Text="(API returned with success, but the stream list was empty)" FontSize="12" TextAlignment="Center" Margin="0,-4,0,-5"/>
-                <TextBlock Text="Please come back tomorrow." FontSize="24" TextAlignment="Center" Margin="0"/>
-                <TextBlock Name="tbRefresh" MouseLeftButtonUp="TbRefresh_MouseLeftButtonUp" Text="Click here to refresh" FontSize="16" Foreground="#FF00AEFF" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,0"/>
+                <TextBlock Text="Please come back tomorrow." FontSize="20" TextAlignment="Center" Margin="0,5,0,0"/>
+                <TextBlock Name="tbRefresh" MouseLeftButtonUp="TbRefresh_MouseLeftButtonUp" Text="Refresh" FontSize="16" Foreground="#FF00AEFF" FontWeight="Bold" TextAlignment="Center" Margin="0,15,0,0"/>
+                <TextBlock Name="tbReturn" MouseLeftButtonUp="TbReturn_MouseLeftButtonUp"  Text="Ignore" FontSize="16" Foreground="#FFFF5100" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,0"/>
             </StackPanel>
         </Grid>
     </Grid>
