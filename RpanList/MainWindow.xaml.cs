@@ -84,6 +84,7 @@ namespace RpanList
                     else // there is at least one stream to display
                     {
                         tbRefresh.Text = "Listing streams...";
+                        tbRefresh2.Text = "Refresh";
                         listStreams(response);
                         rpanDown.Visibility = Visibility.Collapsed;
                         break;
@@ -116,12 +117,17 @@ namespace RpanList
 
         void listStreams(ApiResponse response)
         {
+            double vo = scroller.VerticalOffset;
+            StreamList.Children.Clear();
             foreach (RpanData data in response.data)
             {
                 streams++;
                 views = views + data.continuous_watchers;
                 StreamList.Children.Add(new StreamView(data));
             }
+            scroller.ScrollToVerticalOffset(vo);
+            scroller.UpdateLayout();
+            UpdateLayout();
             Title = "RpanList - " + streams.ToString() + " streams, " + views.ToString() + " viewers";
         }
 
@@ -137,7 +143,7 @@ namespace RpanList
         void Refresh_DoWork(object sender, DoWorkEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() => { tbRefresh.Text = "Refreshing..."; }));
-            Dispatcher.BeginInvoke(new Action(() => { tbRefresh2.Text = "Refreshing..."; }));
+            Dispatcher.BeginInvoke(new Action(() => { tbRefresh2.Text = "Refreshing"; }));
             Dispatcher.BeginInvoke(new Action(() => { parseResponse(RpanApi.grabResponse()); }));
         }
 
@@ -157,8 +163,9 @@ namespace RpanList
                 {
                     refreshRotation = 0;
                 }
-
                 imRefresh.RenderTransform = new RotateTransform(refreshRotation);
+
+                refresh.RunWorkerAsync();
             }
         }
 
