@@ -14,19 +14,12 @@ namespace RpanList
 {
     public partial class MainWindow : Window
     {
-        //BackgroundWorker refresh = new BackgroundWorker();
         DispatcherTimer periodicRefresh = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
 
-        // Set to true after clicking refresh on RpanDown grid
-        bool isRefreshing;
-
-        // Set to true after clicking "Continue browsing" on RpanDown grid
-        bool ignoreRpanDown;
-
-        // Rotation of broken pan in RpanDown grid
-        double panRotation = 0;
-        // Rotation of Refresh button
-        double refreshRotation = 0;
+        bool isRefreshing;          // Set to true after clicking refresh on RpanDown grid
+        bool ignoreRpanDown;        // Set to true after clicking "Continue browsing" on RpanDown grid
+        double panRotation = 0;     // Rotation of broken pan in RpanDown grid
+        double refreshRotation = 0; // Rotation of Refresh button
 
         int streams = 0;
         int views = 0;
@@ -36,7 +29,7 @@ namespace RpanList
             InitializeComponent();
             periodicRefresh.Tick += PeriodicRefresh_Tick;
             retrieveSettings(conf.Default);
-            parseResponse();
+            parseResponse().Wait();
         }
 
         private void PeriodicRefresh_Tick(object sender, EventArgs e)
