@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace RpanList.Classes
 {
     public class RpanApi
     {
-        public static ApiResponse grabResponse()
+        public static async Task<ApiResponse> grabResponse()
         {
             //return new ApiResponse { status = "success", data = new List<RpanData>() };
             HttpClientHandler handler = new HttpClientHandler()
@@ -20,7 +21,7 @@ namespace RpanList.Classes
             HttpResponseMessage response = new HttpResponseMessage();
             try
             {
-                response = client.GetAsync("videos/seed/360").Result;
+                response = await client.GetAsync("videos/seed/360");
             }
             catch (Exception)
             {
@@ -28,7 +29,7 @@ namespace RpanList.Classes
             }
             try
             {
-                string responseString = response.Content.ReadAsStringAsync().Result;
+                string responseString = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<ApiResponse>(responseString);
             }
             catch (Exception)

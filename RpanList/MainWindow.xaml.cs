@@ -46,7 +46,7 @@ namespace RpanList
 
         async Task parseResponse()
         {
-            ApiResponse response = RpanApi.grabResponse();
+            ApiResponse response = await RpanApi.grabResponse();
             int retryLimit = 3;
             for (int i = 0; i < retryLimit; i++)
             {
