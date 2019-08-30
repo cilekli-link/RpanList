@@ -9,8 +9,8 @@
         Title="RpanList" Height="450" Width="800">
     <Grid Background="Black">
 
-        <TabControl Margin="0,0,0,25">
-            <TabItem Height="20">
+        <TabControl Name="tabs" Margin="0,0,0,25" SelectionChanged="TabControl_SelectionChanged">
+            <TabItem Name="tabStreams" Height="20">
                 <TabItem.Header>
                     <WrapPanel>
                         <Image Width="18" Height="18" Source="Icons\streams.png"/>
@@ -53,7 +53,7 @@
                     <TextBlock Name="tbNoStreams" Text="There are no streams to display." Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
                 </Grid>
             </TabItem>
-            <TabItem Height="20" >
+            <TabItem Name="tabRecent" Height="20" >
                 <TabItem.Header>
                     <WrapPanel>
                         <Image Width="18" Height="18" Source="Icons\recent.png"/>
@@ -62,14 +62,24 @@
                 </TabItem.Header>
                 <Grid Background="#FFE5E5E5"/>
             </TabItem>
-            <TabItem Height="20">
+            <TabItem Name="tabLog" Height="20">
                 <TabItem.Header>
                     <WrapPanel>
                         <Image Width="18" Height="18" Source="Icons\log.png"/>
-                        <TextBlock Text="Log" Margin="5,0,0,0"/>
+                        <TextBlock Name="logHeader" Text="Log" Margin="5,0,0,0"/>
                     </WrapPanel>
                 </TabItem.Header>
-                <Grid Background="White"/>
+                <Grid Background="White">
+                    <ScrollViewer>
+                        <StackPanel Name="LogList" Margin="5,3,0,0">
+                            <Grid Visibility="Collapsed">
+                                <Image Source="Icons\error.png" Width="18" Height="18" HorizontalAlignment="Left"/>
+                                <TextBlock Text="Everything died lol" HorizontalAlignment="Left" Margin="22,0,0,0"/>
+                                <TextBlock Text="This is a timestamp." HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
             </TabItem>
 
         </TabControl>

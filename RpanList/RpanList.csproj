@@ -64,6 +64,9 @@
     </ApplicationDefinition>
     <Compile Include="Classes\RpanApi.cs" />
     <Compile Include="FlatButton.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="LogView.cs" />
+    <Compile Include="LogItem.cs" />
     <Compile Include="StreamView.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -132,6 +135,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\recent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\error.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\warning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\debug.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

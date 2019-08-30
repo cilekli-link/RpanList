@@ -3,12 +3,13 @@ using RpanList.Classes;
 using System;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Media;
 using WinForms = System.Windows.Forms;
 using conf = RpanList.Properties.Settings;
+using static RpanList.Logger;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace RpanList
 {
@@ -24,17 +25,32 @@ namespace RpanList
         int streams = 0;
         int views = 0;
 
+        int unreadLogs = 0;
+
         public MainWindow()
         {
             InitializeComponent();
             periodicRefresh.Tick += PeriodicRefresh_Tick;
+            LogEntryAdded += logEntryAdded;
+            Log(LogSeverity.Debug, "Application started");
             retrieveSettings(conf.Default);
-            refresh();
+            Log(LogSeverity.Debug, "Retrieved user settings");
+            refresh(true);
+        }
+
+        private void logEntryAdded(LogEntry logEntry)
+        {
+            if (tabs.SelectedIndex != 2)
+            {
+                unreadLogs++;
+                logHeader.Text = "Log (" + unreadLogs + ")";
+            }
+            LogList.Children.Add(new LogView(logEntry));
         }
 
         private void PeriodicRefresh_Tick(object sender, EventArgs e)
         {
-            if (!isRefreshing) refresh();
+            if (!isRefreshing) refresh(false);
         }
 
         async Task parseResponse()
@@ -54,11 +70,14 @@ namespace RpanList
                     {
                         isRefreshing = false;
                         tbRefresh.Text = "Could not refresh";
+
                         throwError("RPAN API returned with error. Please try again.");
+                        Log(LogSeverity.Error, "Could not connect (API returned \"User ID not found\", aborted after 20 retries");
                         return;
                     }
                     else
                     {
+                        Log(LogSeverity.Warning, "Could not connect - retrying.");
                         continue;
                     }
                 }
@@ -69,6 +88,7 @@ namespace RpanList
                     if (response.data.Count == 0) // response contains no streams (usually means that RPAN has ended for today)
                     {
                         Title = "RpanList - RPAN is down";
+                        Log(LogSeverity.Warning, "Connected, but RPAN is currently down (no streams)");
                         if (periodicRefresh.IsEnabled)
                         {
                             periodicRefresh.Stop();
@@ -90,6 +110,7 @@ namespace RpanList
                     }
                     else // there is at least one stream to display
                     {
+                        Log(LogSeverity.Info, "Connected, listing streams.");
                         Title = "RpanList - Listing streams...";
                         tbRefresh.Text = "Listing streams...";
                         tbNoStreams.Visibility = Visibility.Hidden;
@@ -100,22 +121,13 @@ namespace RpanList
                     }
 
                 }
-                else if (response.status == "Couldn't connect")
-                {
-                    throwError("Could not connect to RPAN API.");
-                }
-                else if (response.status == "Couldn't parse JSON")
-                {
-                    throwError("Could not understand RPAN API response.");
-                }
                 else
                 {
-                    throwError("RPAN API returned with error: " + response.status);
+                    Title = "RpanList - Couldn't connect";
+                    tbRefresh.Text = "Could not refresh";
+                    Log(LogSeverity.Error, "Failed to connect to RPAN API: status: " + response.status);
                 }
-                Title = "RpanList - Couldn't connect";
-                tbRefresh.Text = "Could not refresh";
             }
-            // user can click tbRefresh again
             isRefreshing = false;
         }
 
@@ -138,6 +150,7 @@ namespace RpanList
                 tbSearch.TextChanged += sw.SearchTermChanged;
                 StreamList.Children.Add(sw);
             }
+            Log(LogSeverity.Info, "Listed " + streams + " streams.");
             scroller.ScrollToVerticalOffset(vo);
             scroller.UpdateLayout();
             UpdateLayout();
@@ -146,13 +159,22 @@ namespace RpanList
 
         private void TbRefresh_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (!isRefreshing) refresh();
+            if (!isRefreshing) refresh(false);
         }
 
-        async void refresh()
+        async void refresh(bool firstTime)
         {
             isRefreshing = true;
-            Title = "RpanList - Connecting...";
+            if (firstTime)
+            {
+                Log(LogSeverity.Info, "Connecting to RPAN...");
+                Title = "RpanList - Connecting...";
+            }
+            else
+            {
+                Log(LogSeverity.Info, "Refreshing...");
+                Title = "RpanList - Refreshing...";
+            }
             tbRefresh.Text = "Refreshing...";
             tbRefresh2.Text = "Refreshing";
             await parseResponse();
@@ -160,6 +182,7 @@ namespace RpanList
 
         private void TbReturn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            Log(LogSeverity.Debug, "Broken pan ignored");
             ignoreRpanDown = true;
             rpanDown.Visibility = Visibility.Hidden;
         }
@@ -176,7 +199,7 @@ namespace RpanList
                 }
                 imRefresh.RenderTransform = new RotateTransform(refreshRotation);
 
-                refresh();
+                refresh(false);
             }
         }
 
@@ -185,7 +208,7 @@ namespace RpanList
             switch (type)
             {
                 case BrowseType.YoutubeDl:
-                    Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
+                    OpenFileDialog ofd = new OpenFileDialog();
                     ofd.Title = "Open youtube-dl";
                     ofd.Filter = "Application (*.exe)|*.exe|All files (*.*)|*.*";
                     if (ofd.ShowDialog() == true && !string.IsNullOrWhiteSpace(ofd.FileName))
@@ -196,7 +219,7 @@ namespace RpanList
                     }
                     break;
                 case BrowseType.Downloads:
-                    FolderBrowserDialog fbd = new FolderBrowserDialog();
+                    WinForms.FolderBrowserDialog fbd = new WinForms.FolderBrowserDialog();
                     fbd.Description = "Please select the folder where downloaded streams will be saved to.";
                     if (fbd.ShowDialog() == WinForms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
@@ -252,7 +275,7 @@ namespace RpanList
         {
             tbYtdlPath.Text = s.ytdlPath;
             tbDownloadDir.Text = s.downloadDir;
-            (wfhRefreshDelay.Child as NumericUpDown).Value = s.refreshDelay;
+            (wfhRefreshDelay.Child as WinForms.NumericUpDown).Value = s.refreshDelay;
         }
 
         private void TbSearch_GotFocus(object sender, RoutedEventArgs e)
@@ -269,12 +292,21 @@ namespace RpanList
         {
             if (wfhRefreshDelay.Child != null)
             {
-                int newDelay = (int)(wfhRefreshDelay.Child as NumericUpDown).Value;
+                int newDelay = (int)(wfhRefreshDelay.Child as WinForms.NumericUpDown).Value;
                 if (periodicRefresh.IsEnabled) periodicRefresh.Stop();
                 periodicRefresh.Interval = TimeSpan.FromSeconds(newDelay);
                 periodicRefresh.Start();
                 conf.Default.refreshDelay = newDelay;
                 conf.Default.Save();
+            }
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (tabs.SelectedIndex == 2)
+            {
+                unreadLogs = 0;
+                logHeader.Text = "Log";
             }
         }
     }
