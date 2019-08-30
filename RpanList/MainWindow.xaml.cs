@@ -29,7 +29,7 @@ namespace RpanList
             InitializeComponent();
             periodicRefresh.Tick += PeriodicRefresh_Tick;
             retrieveSettings(conf.Default);
-            parseResponse().Wait();
+            refresh();
         }
 
         private void PeriodicRefresh_Tick(object sender, EventArgs e)
@@ -64,29 +64,28 @@ namespace RpanList
                 }
                 if (response.status == "success")
                 {
-                    tbRefresh.Text = "Refresh";
-
+                    tbRefresh2.Text = "Refresh";
                     if (response.data.Count == 0) // response contains no streams (usually means that RPAN has ended for today)
                     {
+                        Title = "RpanList - RPAN is down";
                         if (rpanDown.Visibility == Visibility.Visible) // if already in RpanError, update the header and rotate the pan
                         {
                             tbRpanDown.Text = "RPAN is still down";
                             tbRefresh.Text = "Refresh again";
                             panRotation += 5;
                             tbBrokenPan.RenderTransform = new RotateTransform(panRotation);
-                            break;
                         }
                         else if (!ignoreRpanDown) // if not in RpanDown, reset text and display RpanDown
                         {
                             tbRpanDown.Text = "RPAN is down";
                             rpanDown.Visibility = Visibility.Visible;
-                            break;
                         }
+                        break;
                     }
                     else // there is at least one stream to display
                     {
+                        Title = "RpanList - Listing streams...";
                         tbRefresh.Text = "Listing streams...";
-                        tbRefresh2.Text = "Refresh";
                         listStreams(response);
                         rpanDown.Visibility = Visibility.Collapsed;
                         if (!periodicRefresh.IsEnabled) periodicRefresh.Start();
@@ -106,7 +105,7 @@ namespace RpanList
                 {
                     throwError("RPAN API returned with error: " + response.status);
                 }
-
+                Title = "RpanList - Couldn't connect";
                 tbRefresh.Text = "Could not refresh";
             }
             // user can click tbRefresh again
@@ -149,9 +148,10 @@ namespace RpanList
 
         async void refresh()
         {
-           tbRefresh.Text = "Refreshing...";
-           tbRefresh2.Text = "Refreshing";
-           await parseResponse();
+            Title = "RpanList - Connecting...";
+            tbRefresh.Text = "Refreshing...";
+            tbRefresh2.Text = "Refreshing";
+            await parseResponse();
         }
 
         private void TbReturn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)

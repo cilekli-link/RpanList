@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RpanList"
         mc:Ignorable="d"
-        Title="RpanList - not connected yet" Height="450" Width="800">
+        Title="RpanList" Height="450" Width="800">
     <Grid>
         <Grid Height="25" VerticalAlignment="Top" Background="#FF006380">
             <Grid.ColumnDefinitions>
