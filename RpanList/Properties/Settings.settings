@@ -8,5 +8,8 @@
     <Setting Name="downloadDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">%userprofile%\Downloads\</Value>
     </Setting>
+    <Setting Name="refreshDelay" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

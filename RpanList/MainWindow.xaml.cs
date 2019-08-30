@@ -248,6 +248,7 @@ namespace RpanList
         {
             tbYtdlPath.Text = s.ytdlPath;
             tbDownloadDir.Text = s.downloadDir;
+            (wfhRefreshDelay.Child as NumericUpDown).Value = s.refreshDelay;
         }
 
         private void TbSearch_GotFocus(object sender, RoutedEventArgs e)
@@ -258,6 +259,19 @@ namespace RpanList
         private void TbSearch_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(tbSearch.Text)) tbSearch.Text = "Search for streams...";
+        }
+
+        private void wfhRefreshDelay_ValueChanged(object sender, EventArgs e)
+        {
+            if (wfhRefreshDelay.Child != null)
+            {
+                int newDelay = (int)(wfhRefreshDelay.Child as NumericUpDown).Value;
+                if (periodicRefresh.IsEnabled) periodicRefresh.Stop();
+                periodicRefresh.Interval = TimeSpan.FromSeconds(newDelay);
+                periodicRefresh.Start();
+                conf.Default.refreshDelay = newDelay;
+                conf.Default.Save();
+            }
         }
     }
 }

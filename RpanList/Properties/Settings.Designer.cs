@@ -46,5 +46,17 @@ namespace RpanList.Properties {
                 this["downloadDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int refreshDelay {
+            get {
+                return ((int)(this["refreshDelay"]));
+            }
+            set {
+                this["refreshDelay"] = value;
+            }
+        }
     }
 }

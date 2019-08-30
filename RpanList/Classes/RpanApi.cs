@@ -11,7 +11,6 @@ namespace RpanList.Classes
     {
         public static async Task<ApiResponse> grabResponse()
         {
-            //return new ApiResponse { status = "success", data = new List<RpanData>() };
             HttpClientHandler handler = new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
