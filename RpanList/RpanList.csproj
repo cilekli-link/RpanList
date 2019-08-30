@@ -124,5 +124,14 @@
   <ItemGroup>
     <Resource Include="Icons\config.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\log.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\streams.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\recent.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

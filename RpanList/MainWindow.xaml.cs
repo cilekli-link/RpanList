@@ -34,7 +34,7 @@ namespace RpanList
 
         private void PeriodicRefresh_Tick(object sender, EventArgs e)
         {
-            refresh();
+            if (!isRefreshing) refresh();
         }
 
         async Task parseResponse()
@@ -64,10 +64,16 @@ namespace RpanList
                 }
                 if (response.status == "success")
                 {
+                    tbRefresh.Text = "Refresh";
                     tbRefresh2.Text = "Refresh";
                     if (response.data.Count == 0) // response contains no streams (usually means that RPAN has ended for today)
                     {
                         Title = "RpanList - RPAN is down";
+                        if (periodicRefresh.IsEnabled)
+                        {
+                            periodicRefresh.Stop();
+                            periodicRefresh.Start();
+                        }
                         if (rpanDown.Visibility == Visibility.Visible) // if already in RpanError, update the header and rotate the pan
                         {
                             tbRpanDown.Text = "RPAN is still down";
@@ -86,6 +92,7 @@ namespace RpanList
                     {
                         Title = "RpanList - Listing streams...";
                         tbRefresh.Text = "Listing streams...";
+                        tbNoStreams.Visibility = Visibility.Hidden;
                         listStreams(response);
                         rpanDown.Visibility = Visibility.Collapsed;
                         if (!periodicRefresh.IsEnabled) periodicRefresh.Start();
@@ -139,15 +146,12 @@ namespace RpanList
 
         private void TbRefresh_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (!isRefreshing)
-            {
-                isRefreshing = true;
-                refresh();
-            }
+            if (!isRefreshing) refresh();
         }
 
         async void refresh()
         {
+            isRefreshing = true;
             Title = "RpanList - Connecting...";
             tbRefresh.Text = "Refreshing...";
             tbRefresh2.Text = "Refreshing";

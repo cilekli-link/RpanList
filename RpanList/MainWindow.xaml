@@ -10,7 +10,13 @@
     <Grid Background="Black">
 
         <TabControl Margin="0,0,0,25">
-            <TabItem Header="Streams" Height="20" Width="54">
+            <TabItem Height="20">
+                <TabItem.Header>
+                    <WrapPanel>
+                        <Image Width="18" Height="18" Source="Icons\streams.png"/>
+                        <TextBlock Text="Streams" Margin="5,0,0,0"/>
+                    </WrapPanel>
+                </TabItem.Header>
                 <Grid>
                     <ScrollViewer Name="scroller" Margin="0">
                         <StackPanel Name="StreamList" Background="Black" >
@@ -44,10 +50,26 @@
                         </StackPanel>
                     </ScrollViewer>
                     <TextBox Name="tbSearch" GotFocus="TbSearch_GotFocus" LostFocus="TbSearch_LostFocus" Grid.Column="0" FontSize="14" Height="22" Text="Search for streams..." VerticalAlignment="Top" Margin="0,0,17,0" Background="#7FFFFFFF" Foreground="White"/>
+                    <TextBlock Name="tbNoStreams" Text="There are no streams to display." Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Recent" Height="20" Width="54">
+            <TabItem Height="20" >
+                <TabItem.Header>
+                    <WrapPanel>
+                        <Image Width="18" Height="18" Source="Icons\recent.png"/>
+                        <TextBlock Text="Recent" Margin="5,0,0,0"/>
+                    </WrapPanel>
+                </TabItem.Header>
                 <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+            <TabItem Height="20">
+                <TabItem.Header>
+                    <WrapPanel>
+                        <Image Width="18" Height="18" Source="Icons\log.png"/>
+                        <TextBlock Text="Log" Margin="5,0,0,0"/>
+                    </WrapPanel>
+                </TabItem.Header>
+                <Grid Background="White"/>
             </TabItem>
 
         </TabControl>
@@ -102,7 +124,7 @@
                     <Grid Name="cbRefresh" MouseLeftButtonUp="CbRefresh_MouseLeftButtonUp" Background="#00000000"/>
                 </Grid>
                 <Grid Height="25" Margin="5,0,0,0">
-                    <TextBlock Foreground="White" Text="Settings" Margin="24,5,0,0" HorizontalAlignment="Right"/>
+                    <TextBlock Foreground="White" Text="Settings" Margin="25,5,0,0" HorizontalAlignment="Right"/>
                     <Image Name="imSettings"  Width="18" Height="18"  Source="Icons\config.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,0,0"/>
                     <Grid Name="cbSettings" MouseLeftButtonUp="CbSettings_MouseLeftButtonUp" Background="#00000000"/>
                 </Grid>
