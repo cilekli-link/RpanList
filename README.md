@@ -2,7 +2,7 @@
 
 Lists current RPAN streams, and lets you download them or watch them on your browser.
 
-Downloading requires [youtube-dl](https://ytdl-org.github.io/youtube-dl/). Extract it somewhere, open RpanList, and locate its path from the Settings panel.
+Downloading requires [youtube-dl](https://ytdl-org.github.io/youtube-dl/) and [ffmpeg](https://ffmpeg.org/download.html). Extract both of them in the same directory, open RpanList, and set youtube-dl's path from the Settings panel.
 
 ## Planned features
 - Opening the stream in a media player like VLC
