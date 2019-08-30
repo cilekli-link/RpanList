@@ -70,7 +70,7 @@
                     </WrapPanel>
                 </TabItem.Header>
                 <Grid Background="White">
-                    <ScrollViewer>
+                    <ScrollViewer Name="LogScroller">
                         <StackPanel Name="LogList" Margin="5,3,0,0">
                             <Grid Visibility="Collapsed">
                                 <Image Source="Icons\error.png" Width="18" Height="18" HorizontalAlignment="Left"/>
@@ -112,7 +112,7 @@
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="400,50,0,0">
                 <TextBlock Text="Connectivity" Foreground="#FFFF9700" FontWeight="Bold" Margin="0,0,0,2" FontSize="14" HorizontalAlignment="Left"/>
                 <WrapPanel>
-                    <TextBlock Text="Periodic refresh delay" Foreground="White" Margin="0,2,10,0"/>
+                    <TextBlock Text="Auto refresh delay" Foreground="White" Margin="0,2,10,0"/>
                     <WindowsFormsHost Name="wfhRefreshDelay" Height="22" Width="37">
                         <WindowsFormsHost.Child>
                             <wf:NumericUpDown Minimum="1" Maximum="1000" ValueChanged="wfhRefreshDelay_ValueChanged"/>

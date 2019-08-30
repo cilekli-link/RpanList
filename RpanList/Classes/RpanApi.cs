@@ -9,16 +9,21 @@ namespace RpanList.Classes
 {
     public class RpanApi
     {
+        static HttpClientHandler handler = new HttpClientHandler()
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        };
+        static HttpClient client;
+        static HttpResponseMessage response;
         public static async Task<ApiResponse> grabResponse()
         {
-            HttpClientHandler handler = new HttpClientHandler()
+            if (client == null)
             {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            };
-            var client = new HttpClient(handler);
-            client.BaseAddress = new Uri("https://strapi.reddit.com");
-            Log(LogSeverity.Debug, "Created new HttpClient");
-            HttpResponseMessage response = new HttpResponseMessage();
+                client = new HttpClient(handler);
+                client.BaseAddress = new Uri("https://strapi.reddit.com");
+                Log(LogSeverity.Debug, "Created new HttpClient");
+            }
+
             try
             {
                 Log(LogSeverity.Debug, "Fetching RPAN API response...");
@@ -29,6 +34,7 @@ namespace RpanList.Classes
                 Log(LogSeverity.Debug, "HttpClient failed: " + e.Message);
                 return new ApiResponse { status = "Couldn't connect" };
             }
+
             Log(LogSeverity.Debug, "Received response from HttpClient");
             try
             {

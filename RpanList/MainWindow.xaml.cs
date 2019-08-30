@@ -46,6 +46,7 @@ namespace RpanList
                 logHeader.Text = "Log (" + unreadLogs + ")";
             }
             LogList.Children.Add(new LogView(logEntry));
+            LogScroller.ScrollToEnd();
         }
 
         private void PeriodicRefresh_Tick(object sender, EventArgs e)
@@ -55,10 +56,10 @@ namespace RpanList
 
         async Task parseResponse()
         {
-            ApiResponse response = await RpanApi.grabResponse();
             int retryLimit = 3;
             for (int i = 0; i < retryLimit; i++)
             {
+                ApiResponse response = await RpanApi.grabResponse();
                 if (response.status == "User ID is not found")
                 {
                     // reddit sometimes returns this
@@ -70,9 +71,11 @@ namespace RpanList
                     {
                         isRefreshing = false;
                         tbRefresh.Text = "Could not refresh";
+                        tbRefresh2.Text = "Refresh";
+                        Title = "RpanList - Couldn't connect";
 
                         throwError("RPAN API returned with error. Please try again.");
-                        Log(LogSeverity.Error, "Could not connect (API returned \"User ID not found\", aborted after 20 retries");
+                        Log(LogSeverity.Error, "Could not connect, aborted after 20 retries");
                         return;
                     }
                     else
