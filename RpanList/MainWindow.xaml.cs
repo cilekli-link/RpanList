@@ -24,7 +24,7 @@ namespace RpanList
 
         int streams = 0;
         int views = 0;
-
+        int failedAttempts = 0;
         int unreadLogs = 0;
 
         public MainWindow()
@@ -36,16 +36,20 @@ namespace RpanList
             retrieveSettings(conf.Default);
             Log(LogSeverity.Debug, "Retrieved user settings");
             refresh(true);
+            periodicRefresh.Start();
         }
 
         private void logEntryAdded(LogEntry logEntry)
         {
-            if (tabs.SelectedIndex != 2)
+            if (tabs.SelectedIndex != 2 && (int)logEntry.Severity >= cbLogLevel.SelectedIndex)
             {
                 unreadLogs++;
                 logHeader.Text = "Log (" + unreadLogs + ")";
             }
-            LogList.Children.Add(new LogView(logEntry));
+            LogView logView = new LogView(logEntry);
+            logView.checkSeverity(cbLogLevel.SelectedIndex);
+            cbLogLevel.SelectionChanged += logView.LogLevelChanged;
+            LogList.Children.Add(logView);
             LogScroller.ScrollToEnd();
         }
 
@@ -56,87 +60,92 @@ namespace RpanList
 
         async Task parseResponse()
         {
-            int retryLimit = 3;
-            for (int i = 0; i < retryLimit; i++)
+            ApiResponse response = await RpanApi.grabResponse();
+            if (response.status == "User ID is not found")
             {
-                ApiResponse response = await RpanApi.grabResponse();
-                if (response.status == "User ID is not found")
+                for (int i = 0; i < 20; i++)
                 {
-                    // reddit sometimes returns this
-                    // it seems to get resolved if you retry a lot
-                    // sorry for the awful workaround, but hey, it works
-                    retryLimit = 20;
+                    Log(LogSeverity.Warning, "Could not connect - retrying (" + i + " of 20)");
                     await Task.Delay(200);
-                    if (i + 1 >= retryLimit)
+                    response = await RpanApi.grabResponse();
+                    if (response.status == "User ID is not found")
                     {
-                        isRefreshing = false;
-                        tbRefresh.Text = "Could not refresh";
-                        tbRefresh2.Text = "Refresh";
-                        Title = "RpanList - Couldn't connect";
-
-                        throwError("RPAN API returned with error. Please try again.");
-                        Log(LogSeverity.Error, "Could not connect, aborted after 20 retries");
-                        return;
+                        if (i >= 20)
+                        {
+                            isRefreshing = false;
+                            tbRefresh.Text = "Could not refresh";
+                            tbRefresh2.Text = "Refresh";
+                            Title = "RpanList - Couldn't connect";
+                            throwError("RPAN API returned with error. Please try again.");
+                            Log(LogSeverity.Error, "Could not connect, aborted after 20 retries");
+                            return;
+                        }
+                        continue;
                     }
                     else
                     {
-                        Log(LogSeverity.Warning, "Could not connect - retrying.");
-                        continue;
+                        break;
                     }
                 }
-                if (response.status == "success")
+            }
+            if (response.status == "success")
+            {
+                tbRefresh.Text = "Refresh";
+                tbRefresh2.Text = "Refresh";
+                if (response.data.Count == 0) // response contains no streams (usually means that RPAN has ended for today)
                 {
-                    tbRefresh.Text = "Refresh";
-                    tbRefresh2.Text = "Refresh";
-                    if (response.data.Count == 0) // response contains no streams (usually means that RPAN has ended for today)
+                    failedAttempts++;
+                    if (failedAttempts == 5)
                     {
-                        Title = "RpanList - RPAN is down";
-                        Log(LogSeverity.Warning, "Connected, but RPAN is currently down (no streams)");
-                        if (periodicRefresh.IsEnabled)
-                        {
-                            periodicRefresh.Stop();
-                            periodicRefresh.Start();
-                        }
-                        if (rpanDown.Visibility == Visibility.Visible) // if already in RpanError, update the header and rotate the pan
-                        {
-                            tbRpanDown.Text = "RPAN is still down";
-                            tbRefresh.Text = "Refresh again";
-                            panRotation += 5;
-                            tbBrokenPan.RenderTransform = new RotateTransform(panRotation);
-                        }
-                        else if (!ignoreRpanDown) // if not in RpanDown, reset text and display RpanDown
-                        {
-                            tbRpanDown.Text = "RPAN is down";
-                            rpanDown.Visibility = Visibility.Visible;
-                        }
-                        break;
+                        Log(LogSeverity.Warning, "5 failed refresh attempts: auto-refresh has been paused for now");
+                        periodicRefresh.Stop();
                     }
-                    else // there is at least one stream to display
+                    Title = "RpanList - RPAN is down";
+                    Log(LogSeverity.Warning, "Connected, but RPAN is currently down (no streams)");
+                    if (periodicRefresh.IsEnabled)
                     {
-                        Log(LogSeverity.Info, "Connected, listing streams.");
-                        Title = "RpanList - Listing streams...";
-                        tbRefresh.Text = "Listing streams...";
-                        tbNoStreams.Visibility = Visibility.Hidden;
-                        listStreams(response);
-                        rpanDown.Visibility = Visibility.Collapsed;
-                        if (!periodicRefresh.IsEnabled) periodicRefresh.Start();
-                        break;
+                        periodicRefresh.Stop();
+                        periodicRefresh.Start();
                     }
 
+                    if (rpanDown.Visibility == Visibility.Visible) // if already in RpanError, update the header and rotate the pan
+                    {
+                        tbRpanDown.Text = "RPAN is still down";
+                        tbRefresh.Text = "Refresh again";
+                        panRotation += 5;
+                        tbBrokenPan.RenderTransform = new RotateTransform(panRotation);
+                    }
+                    else if (!ignoreRpanDown) // if not in RpanDown, reset text and display RpanDown
+                    {
+                        tbRpanDown.Text = "RPAN is down";
+                        rpanDown.Visibility = Visibility.Visible;
+                    }
                 }
-                else
+                else // there is at least one stream to display
                 {
-                    Title = "RpanList - Couldn't connect";
-                    tbRefresh.Text = "Could not refresh";
-                    Log(LogSeverity.Error, "Failed to connect to RPAN API: status: " + response.status);
+                    failedAttempts = 0;
+                    Log(LogSeverity.Info, "Connected, listing streams.");
+                    Title = "RpanList - Listing streams...";
+                    tbRefresh.Text = "Listing streams...";
+                    tbNoStreams.Visibility = Visibility.Hidden;
+                    listStreams(response);
+                    rpanDown.Visibility = Visibility.Collapsed;
+                    if (!periodicRefresh.IsEnabled) periodicRefresh.Start();
                 }
+
+            }
+            else
+            {
+                Title = "RpanList - Couldn't connect";
+                tbRefresh.Text = "Could not refresh";
+                Log(LogSeverity.Error, "Failed to connect to RPAN API: status: " + response.status);
             }
             isRefreshing = false;
         }
 
         void throwError(string errorMessage)
         {
-            System.Windows.MessageBox.Show(errorMessage);
+            MessageBox.Show(errorMessage);
         }
 
         void listStreams(ApiResponse response)
@@ -194,7 +203,6 @@ namespace RpanList
         {
             if (!isRefreshing)
             {
-                isRefreshing = true;
                 refreshRotation += -30;
                 if (refreshRotation <= -360)
                 {
@@ -311,6 +319,16 @@ namespace RpanList
                 unreadLogs = 0;
                 logHeader.Text = "Log";
             }
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void BtnClearLogs_Click(object sender, RoutedEventArgs e)
+        {
+            LogList.Children.Clear();
         }
     }
 }

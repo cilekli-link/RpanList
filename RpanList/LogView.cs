@@ -11,9 +11,26 @@ namespace RpanList
 {
     class LogView : Grid
     {
+        LogEntry entry;
+        public void LogLevelChanged(object sender, EventArgs e)
+        {
+            checkSeverity((sender as ComboBox).SelectedIndex);
+        }
 
+        public void checkSeverity(int severity)
+        {
+            if (severity <= (int)entry.Severity)
+            {
+                Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Visibility = Visibility.Collapsed;
+            }
+        }
         public LogView(LogEntry item)
         {
+            entry = item;
             Height = 18;
             Image icon = new Image
             {
