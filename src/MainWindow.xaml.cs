@@ -35,7 +35,6 @@ namespace RpanList
             LogEntryAdded += logEntryAdded;
             Log(LogSeverity.Debug, "Application started");
             retrieveSettings(conf.Default);
-            Log(LogSeverity.Debug, "Retrieved user settings");
             refresh(true);
             periodicRefresh.Start();
         }
@@ -68,20 +67,22 @@ namespace RpanList
         async Task parseResponse()
         {
             ApiResponse response = await RpanApi.grabResponse();
+
             if (response.status == "User ID is not found")
+                // reddit sometimes returns this. idk why, but it gets resolved if you retry a lot.
+                // that's what this for loop does
             {
                 for (int i = 0; i < 20; i++)
                 {
                     Log(LogSeverity.Warning, "Could not connect - retrying (" + i + " of 20)");
-                    await Task.Delay(200);
+                    await Task.Delay(1000); // let the API rest (?)
                     response = await RpanApi.grabResponse();
                     if (response.status == "User ID is not found")
                     {
                         if (i >= 19)
                         {
                             isRefreshing = false;
-                            tbRefresh.Text = "Could not refresh";
-                            tbRefresh2.Text = "Refresh";
+                            tbRpanDownRefresh.Text = "Could not refresh";
                             setTitle("RpanList - Couldn't connect");
                             Log(LogSeverity.Error, "Could not connect, aborted after 20 retries");
                             return;
@@ -99,38 +100,31 @@ namespace RpanList
             }
             if (response.status == "success")
             {
-                tbRefresh.Text = "Refresh";
-                tbRefresh2.Text = "Refresh";
+                tbRpanDownRefresh.Text = "Refresh";
                 if (response.data.Count == 0) // response contains no streams (usually means that RPAN has ended for today)
                 {
-                    checkFailedAttempts();
                     setTitle("RpanList - RPAN is down");
                     Log(LogSeverity.Warning, "Connected, but RPAN is currently down (no streams)");
-                    if (periodicRefresh.IsEnabled)
-                    {
-                        periodicRefresh.Stop();
-                        periodicRefresh.Start();
-                    }
-
                     if (rpanDown.Visibility == Visibility.Visible) // if already in RpanError, update the header and rotate the pan
                     {
                         tbRpanDown.Text = "RPAN is still down";
-                        tbRefresh.Text = "Refresh again";
+                        tbRpanDownRefresh.Text = "Refresh again";
                         panRotation += 5;
                         tbBrokenPan.RenderTransform = new RotateTransform(panRotation);
                     }
-                    else if (!ignoreRpanDown) // if not in RpanDown, reset text and display RpanDown
+                    else if (!ignoreRpanDown && conf.Default.showBrokenPan) // if not in RpanDown, reset text and display RpanDown
                     {
                         tbRpanDown.Text = "RPAN is down";
                         rpanDown.Visibility = Visibility.Visible;
                     }
+                    checkFailedAttempts();
                 }
                 else // there is at least one stream to display
                 {
                     failedAttempts = 0;
                     Log(LogSeverity.Info, "Connected, listing streams.");
                     setTitle("RpanList - Listing streams...");
-                    tbRefresh.Text = "Listing streams...";
+                    tbRpanDownRefresh.Text = "Listing streams...";
                     tbNoStreams.Visibility = Visibility.Hidden;
                     listStreams(response);
                     rpanDown.Visibility = Visibility.Collapsed;
@@ -146,7 +140,7 @@ namespace RpanList
                 checkFailedAttempts();
                 failedAttempts++;
                 setTitle("RpanList - Couldn't connect");
-                tbRefresh.Text = "Could not refresh";
+                tbRpanDownRefresh.Text = "Could not refresh";
                 Log(LogSeverity.Error, "Failed to connect to RPAN API: status: " + response.status);
             }
             isRefreshing = false;
@@ -183,39 +177,46 @@ namespace RpanList
 
         void checkFailedAttempts()
         {
-            failedAttempts++;
-            if (failedAttempts == 5)
+            if (periodicRefresh.IsEnabled)
             {
-                Log(LogSeverity.Warning, "5 failed refresh attempts: auto-refresh has been paused for now");
-                periodicRefresh.Stop();
+                failedAttempts++;
+                if (failedAttempts == conf.Default.maxRefreshAttempts)
+                {
+                    Log(LogSeverity.Warning, conf.Default.maxRefreshAttempts + " failed refresh attempt(s): auto-refresh has been paused for now");
+                    periodicRefresh.Stop();
+                }
             }
         }
         async void refresh(bool firstTime)
         {
             isRefreshing = true;
-            if (firstTime)
+
+            if (firstTime) // Connecting for the first time?
             {
                 Log(LogSeverity.Info, "Connecting to RPAN...");
                 setTitle("RpanList - Connecting...");
+                tbToolbarRefresh.Text = "Connecting";
             }
             else
             {
                 Log(LogSeverity.Info, "Refreshing...");
                 setTitle("RpanList - Refreshing...");
+                tbToolbarRefresh.Text = "Refreshing";
+                tbRpanDownRefresh.Text = "Refreshing...";
             }
-            tbRefresh.Text = "Refreshing...";
-            tbRefresh2.Text = "Refreshing";
             await parseResponse();
+            // tbRpanDownRefresh.Text doesn't get changed here, because it can also be "Refresh again" or "Could not refresh"
+            tbToolbarRefresh.Text = "Refresh";
         }
 
-        private void TbReturn_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void TbReturn_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Log(LogSeverity.Debug, "Broken pan ignored");
             ignoreRpanDown = true;
             rpanDown.Visibility = Visibility.Hidden;
         }
 
-        private void CbRefresh_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void CbRefresh_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (!isRefreshing)
             {
@@ -292,6 +293,8 @@ namespace RpanList
         void retrieveSettings(conf s)
         {
             (wfhRefreshDelay.Child as WinForms.NumericUpDown).Value = s.refreshDelay;
+            (wfhMaxRefreshAttempts.Child as WinForms.NumericUpDown).Value = s.maxRefreshAttempts;
+
             if (s.borderlessWindow)
             {
                 WindowStyle = WindowStyle.None;
@@ -305,6 +308,8 @@ namespace RpanList
                 WindowChrome.SetWindowChrome(this, null);
                 BorderlessStuff.Visibility = Visibility.Collapsed;
             }
+
+            Log(LogSeverity.Debug, "Retrieved user settings");
         }
 
         private void TbSearch_GotFocus(object sender, RoutedEventArgs e)
@@ -336,7 +341,15 @@ namespace RpanList
                 periodicRefresh.Interval = TimeSpan.FromSeconds(newDelay);
                 periodicRefresh.Start();
                 conf.Default.refreshDelay = newDelay;
-                conf.Default.Save();
+            }
+        }
+
+        private void wfhMaxRefreshAttempts_ValueChanged(object sender, EventArgs e)
+        {
+            if (wfhRefreshDelay.Child != null)
+            {
+                int newValue = (int)(wfhRefreshDelay.Child as WinForms.NumericUpDown).Value;
+                conf.Default.maxRefreshAttempts = newValue;
             }
         }
 

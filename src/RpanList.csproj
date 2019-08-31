@@ -29,7 +29,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\build\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -143,18 +143,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\recent.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\error.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\warning.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\info.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\debug.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\rpanlist.ico" />

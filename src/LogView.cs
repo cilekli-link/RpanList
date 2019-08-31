@@ -28,7 +28,7 @@ namespace RpanList
         {
             entry = item;
             Height = 18;
-            Image icon = new Image
+            Viewbox icon = new Viewbox
             {
                 Width = 18,
                 Height = 18,
@@ -48,22 +48,23 @@ namespace RpanList
             switch (item.Severity)
             {
                 case LogSeverity.Debug:
-                    imageName = "debug";
+                    imageName = "Debug";
                     icon.Opacity = 0.5;
                     content.Opacity = 0.5;
                     timestamp.Opacity = 0.5;
                     break;
                 case LogSeverity.Info:
-                    imageName = "info";
+                    imageName = "Info";
                     break;
                 case LogSeverity.Warning:
-                    imageName = "warning";
+                    imageName = "Warning";
                     break;
                 case LogSeverity.Error:
-                    imageName = "error";
+                    imageName = "Error";
                     break;
             }
-            icon.Source = new BitmapImage(new Uri(@"/RpanList;component/Icons/" + imageName + ".png", UriKind.Relative));
+            //icon.Source = new BitmapImage(new Uri(@"/RpanList;component/Icons/" + imageName + ".png", UriKind.Relative));
+            icon.Child = (Canvas)FindResource("icn" + imageName);
             content.Text = item.Content;
             timestamp.Text = item.Timestamp.ToString();
 

@@ -70,5 +70,29 @@ namespace RpanList.Properties {
                 this["borderlessWindow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool showBrokenPan {
+            get {
+                return ((bool)(this["showBrokenPan"]));
+            }
+            set {
+                this["showBrokenPan"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int maxRefreshAttempts {
+            get {
+                return ((int)(this["maxRefreshAttempts"]));
+            }
+            set {
+                this["maxRefreshAttempts"] = value;
+            }
+        }
     }
 }
