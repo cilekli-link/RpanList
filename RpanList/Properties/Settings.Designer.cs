@@ -25,7 +25,7 @@ namespace RpanList.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\youtube-dl.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ytdlPath {
             get {
                 return ((string)(this["ytdlPath"]));
@@ -56,6 +56,18 @@ namespace RpanList.Properties {
             }
             set {
                 this["refreshDelay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool borderlessWindow {
+            get {
+                return ((bool)(this["borderlessWindow"]));
+            }
+            set {
+                this["borderlessWindow"] = value;
             }
         }
     }

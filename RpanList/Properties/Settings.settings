@@ -3,13 +3,16 @@
   <Profiles />
   <Settings>
     <Setting Name="ytdlPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\youtube-dl.exe</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="downloadDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">%userprofile%\Downloads\</Value>
     </Setting>
     <Setting Name="refreshDelay" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="borderlessWindow" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

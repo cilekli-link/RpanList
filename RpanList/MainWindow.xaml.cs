@@ -4,7 +4,9 @@ using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shell;
 using System.Windows.Threading;
 using static RpanList.Logger;
 using conf = RpanList.Properties.Settings;
@@ -49,7 +51,10 @@ namespace RpanList
             logView.checkSeverity(cbLogLevel.SelectedIndex);
             cbLogLevel.SelectionChanged += logView.LogLevelChanged;
             LogList.Children.Add(logView);
-            LogScroller.ScrollToEnd();
+            if (cbAutoscrollLog.IsChecked == true)
+            {
+                LogScroller.ScrollToEnd();
+            }
         }
 
         private void PeriodicRefresh_Tick(object sender, EventArgs e)
@@ -72,19 +77,21 @@ namespace RpanList
                     response = await RpanApi.grabResponse();
                     if (response.status == "User ID is not found")
                     {
-                        if (i >= 20)
+                        if (i >= 19)
                         {
                             isRefreshing = false;
                             tbRefresh.Text = "Could not refresh";
                             tbRefresh2.Text = "Refresh";
-                            Title = "RpanList - Couldn't connect";
-                            throwError("RPAN API returned with error. Please try again.");
+                            setTitle("RpanList - Couldn't connect");
                             Log(LogSeverity.Error, "Could not connect, aborted after 20 retries");
                             return;
                         }
-                        continue;
+                        else // retry attempts didn't reach limit yet
+                        {
+                            continue;
+                        }
                     }
-                    else
+                    else // if response is something else
                     {
                         break;
                     }
@@ -96,13 +103,8 @@ namespace RpanList
                 tbRefresh2.Text = "Refresh";
                 if (response.data.Count == 0) // response contains no streams (usually means that RPAN has ended for today)
                 {
-                    failedAttempts++;
-                    if (failedAttempts == 5)
-                    {
-                        Log(LogSeverity.Warning, "5 failed refresh attempts: auto-refresh has been paused for now");
-                        periodicRefresh.Stop();
-                    }
-                    Title = "RpanList - RPAN is down";
+                    checkFailedAttempts();
+                    setTitle("RpanList - RPAN is down");
                     Log(LogSeverity.Warning, "Connected, but RPAN is currently down (no streams)");
                     if (periodicRefresh.IsEnabled)
                     {
@@ -127,7 +129,7 @@ namespace RpanList
                 {
                     failedAttempts = 0;
                     Log(LogSeverity.Info, "Connected, listing streams.");
-                    Title = "RpanList - Listing streams...";
+                    setTitle("RpanList - Listing streams...");
                     tbRefresh.Text = "Listing streams...";
                     tbNoStreams.Visibility = Visibility.Hidden;
                     listStreams(response);
@@ -141,16 +143,13 @@ namespace RpanList
             }
             else
             {
-                Title = "RpanList - Couldn't connect";
+                checkFailedAttempts();
+                failedAttempts++;
+                setTitle("RpanList - Couldn't connect");
                 tbRefresh.Text = "Could not refresh";
                 Log(LogSeverity.Error, "Failed to connect to RPAN API: status: " + response.status);
             }
             isRefreshing = false;
-        }
-
-        void throwError(string errorMessage)
-        {
-            MessageBox.Show(errorMessage);
         }
 
         void listStreams(ApiResponse response)
@@ -171,7 +170,7 @@ namespace RpanList
             scroller.ScrollToVerticalOffset(vo);
             scroller.UpdateLayout();
             UpdateLayout();
-            Title = "RpanList - " + streams.ToString() + " streams, " + views.ToString() + " viewers";
+            setTitle("RpanList - " + streams.ToString() + " streams, " + views.ToString() + " viewers");
         }
 
         private void TbRefresh_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -182,18 +181,27 @@ namespace RpanList
             }
         }
 
+        void checkFailedAttempts()
+        {
+            failedAttempts++;
+            if (failedAttempts == 5)
+            {
+                Log(LogSeverity.Warning, "5 failed refresh attempts: auto-refresh has been paused for now");
+                periodicRefresh.Stop();
+            }
+        }
         async void refresh(bool firstTime)
         {
             isRefreshing = true;
             if (firstTime)
             {
                 Log(LogSeverity.Info, "Connecting to RPAN...");
-                Title = "RpanList - Connecting...";
+                setTitle("RpanList - Connecting...");
             }
             else
             {
                 Log(LogSeverity.Info, "Refreshing...");
-                Title = "RpanList - Refreshing...";
+                setTitle("RpanList - Refreshing...");
             }
             tbRefresh.Text = "Refreshing...";
             tbRefresh2.Text = "Refreshing";
@@ -234,8 +242,6 @@ namespace RpanList
                     };
                     if (ofd.ShowDialog() == true && !string.IsNullOrWhiteSpace(ofd.FileName))
                     {
-                        conf.Default.ytdlPath = ofd.FileName;
-                        conf.Default.Save();
                         tbYtdlPath.Text = conf.Default.ytdlPath;
                     }
                     break;
@@ -246,8 +252,6 @@ namespace RpanList
                     };
                     if (fbd.ShowDialog() == WinForms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
-                        conf.Default.downloadDir = fbd.SelectedPath;
-                        conf.Default.Save();
                         tbDownloadDir.Text = conf.Default.downloadDir;
                     }
                     break;
@@ -272,33 +276,35 @@ namespace RpanList
             openBrowse(BrowseType.Downloads);
         }
 
-        private void TbYtdlPath_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void CbSettings_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            conf.Default.ytdlPath = tbYtdlPath.Text;
-            conf.Default.Save();
-        }
-
-        private void TbDownloadDir_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            conf.Default.downloadDir = tbDownloadDir.Text;
-            conf.Default.Save();
-        }
-
-        private void TbCloseSettings_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            settingsGrid.Visibility = Visibility.Collapsed;
-        }
-
-        private void CbSettings_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            settingsGrid.Visibility = Visibility.Visible;
+            if (settingsGrid.Visibility == Visibility.Visible)
+            {
+                conf.Default.Save();
+                settingsGrid.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                settingsGrid.Visibility = Visibility.Visible;
+            }
         }
 
         void retrieveSettings(conf s)
         {
-            tbYtdlPath.Text = s.ytdlPath;
-            tbDownloadDir.Text = s.downloadDir;
             (wfhRefreshDelay.Child as WinForms.NumericUpDown).Value = s.refreshDelay;
+            if (s.borderlessWindow)
+            {
+                WindowStyle = WindowStyle.None;
+                if (WindowState == WindowState.Maximized) MainGrid.Margin = new Thickness(6);
+                WindowChrome.SetWindowChrome(this, new WindowChrome { CaptionHeight = 0, ResizeBorderThickness = new Thickness(5) });
+                BorderlessStuff.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                WindowChrome.SetWindowChrome(this, null);
+                BorderlessStuff.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void TbSearch_GotFocus(object sender, RoutedEventArgs e)
@@ -346,6 +352,84 @@ namespace RpanList
         private void BtnClearLogs_Click(object sender, RoutedEventArgs e)
         {
             LogList.Children.Clear();
+        }
+
+        private void VbMinimize_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void VbClose_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Close();
+        }
+
+        private void VbMaximize_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (WindowState == WindowState.Normal)
+            {
+                WindowState = WindowState.Maximized;
+            }
+            else
+            {
+                WindowState = WindowState.Normal;
+            }
+        }
+
+        void setTitle(string newTitle)
+        {
+            Title = newTitle;
+            tbTitle.Text = newTitle;
+        }
+
+        private void CbBorderless_Checked(object sender, RoutedEventArgs e)
+        {
+            if (cbBorderless != null && BorderlessStuff != null)
+            {
+                if (cbBorderless.IsChecked == true)
+                {
+                    WindowStyle = WindowStyle.None;
+                    if (WindowState == WindowState.Maximized) MainGrid.Margin = new Thickness(6);
+                    WindowChrome.SetWindowChrome(this, new WindowChrome { CaptionHeight = 0, ResizeBorderThickness = new Thickness(5) });
+                    BorderlessStuff.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    WindowStyle = WindowStyle.SingleBorderWindow;
+                    MainGrid.Margin = new Thickness(0);
+                    WindowChrome.SetWindowChrome(this, null);
+                    BorderlessStuff.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private void Tabs_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                DragMove();
+            }
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (cbBorderless.IsChecked == true)
+            {
+                if (WindowState == WindowState.Maximized)
+                {
+                    MainGrid.Margin = new Thickness(6);
+                }
+                else
+                {
+                    MainGrid.Margin = new Thickness(0);
+                }
+            }
+        }
+
+        private void CmSaveSettings_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            conf.Default.Save();
+            settingsGrid.Visibility = Visibility.Collapsed;
         }
     }
 }

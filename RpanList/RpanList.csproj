@@ -68,6 +68,14 @@
     <Compile Include="LogView.cs" />
     <Compile Include="LogItem.cs" />
     <Compile Include="StreamView.cs" />
+    <Page Include="Effects.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Icons\vector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -147,6 +155,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\debug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\rpanlist.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

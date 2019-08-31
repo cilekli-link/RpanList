@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:RpanList"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="effects.xaml"/>
+                <ResourceDictionary Source="icons\vector.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
