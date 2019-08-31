@@ -72,7 +72,7 @@
                 <Grid Background="White">
                     <Grid Height="25" VerticalAlignment="Top" Background="White">
                         <TextBlock Text="Log level:" Margin="3,4,0,0" HorizontalAlignment="Left"/>
-                        <ComboBox SelectedIndex="1" Name="cbLogLevel" HorizontalAlignment="Left" Margin="60,1,0,1" Width="75" SelectionChanged="ComboBox_SelectionChanged">
+                        <ComboBox SelectedIndex="1" Name="cbLogLevel" HorizontalAlignment="Left" Margin="60,1,0,1" Width="75">
                             <ComboBoxItem Content="Debug"/>
                             <ComboBoxItem Content="Info"/>
                             <ComboBoxItem Content="Warning"/>
