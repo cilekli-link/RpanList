@@ -321,11 +321,6 @@ namespace RpanList
             }
         }
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
         private void BtnClearLogs_Click(object sender, RoutedEventArgs e)
         {
             LogList.Children.Clear();
