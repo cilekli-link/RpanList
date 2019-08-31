@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,8 +18,10 @@ namespace RpanList.Classes
         {
             if (client == null)
             {
-                client = new HttpClient(handler);
-                client.BaseAddress = new Uri("https://strapi.reddit.com");
+                client = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri("https://strapi.reddit.com")
+                };
                 Log(LogSeverity.Debug, "Created new HttpClient");
             }
 

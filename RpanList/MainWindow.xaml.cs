@@ -1,15 +1,14 @@
 ﻿using Microsoft.Win32;
 using RpanList.Classes;
 using System;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Media;
-using WinForms = System.Windows.Forms;
-using conf = RpanList.Properties.Settings;
-using static RpanList.Logger;
-using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Threading;
+using static RpanList.Logger;
+using conf = RpanList.Properties.Settings;
+using WinForms = System.Windows.Forms;
 
 namespace RpanList
 {
@@ -55,7 +54,10 @@ namespace RpanList
 
         private void PeriodicRefresh_Tick(object sender, EventArgs e)
         {
-            if (!isRefreshing) refresh(false);
+            if (!isRefreshing)
+            {
+                refresh(false);
+            }
         }
 
         async Task parseResponse()
@@ -130,7 +132,10 @@ namespace RpanList
                     tbNoStreams.Visibility = Visibility.Hidden;
                     listStreams(response);
                     rpanDown.Visibility = Visibility.Collapsed;
-                    if (!periodicRefresh.IsEnabled) periodicRefresh.Start();
+                    if (!periodicRefresh.IsEnabled)
+                    {
+                        periodicRefresh.Start();
+                    }
                 }
 
             }
@@ -171,7 +176,10 @@ namespace RpanList
 
         private void TbRefresh_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (!isRefreshing) refresh(false);
+            if (!isRefreshing)
+            {
+                refresh(false);
+            }
         }
 
         async void refresh(bool firstTime)
@@ -219,9 +227,11 @@ namespace RpanList
             switch (type)
             {
                 case BrowseType.YoutubeDl:
-                    OpenFileDialog ofd = new OpenFileDialog();
-                    ofd.Title = "Open youtube-dl";
-                    ofd.Filter = "Application (*.exe)|*.exe|All files (*.*)|*.*";
+                    OpenFileDialog ofd = new OpenFileDialog
+                    {
+                        Title = "Open youtube-dl",
+                        Filter = "Application (*.exe)|*.exe|All files (*.*)|*.*"
+                    };
                     if (ofd.ShowDialog() == true && !string.IsNullOrWhiteSpace(ofd.FileName))
                     {
                         conf.Default.ytdlPath = ofd.FileName;
@@ -230,8 +240,10 @@ namespace RpanList
                     }
                     break;
                 case BrowseType.Downloads:
-                    WinForms.FolderBrowserDialog fbd = new WinForms.FolderBrowserDialog();
-                    fbd.Description = "Please select the folder where downloaded streams will be saved to.";
+                    WinForms.FolderBrowserDialog fbd = new WinForms.FolderBrowserDialog
+                    {
+                        Description = "Please select the folder where downloaded streams will be saved to."
+                    };
                     if (fbd.ShowDialog() == WinForms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
                         conf.Default.downloadDir = fbd.SelectedPath;
@@ -291,12 +303,18 @@ namespace RpanList
 
         private void TbSearch_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (tbSearch.Text == "Search for streams...") tbSearch.Text = "";
+            if (tbSearch.Text == "Search for streams...")
+            {
+                tbSearch.Text = "";
+            }
         }
 
         private void TbSearch_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(tbSearch.Text)) tbSearch.Text = "Search for streams...";
+            if (string.IsNullOrWhiteSpace(tbSearch.Text))
+            {
+                tbSearch.Text = "Search for streams...";
+            }
         }
 
         private void wfhRefreshDelay_ValueChanged(object sender, EventArgs e)
@@ -304,7 +322,11 @@ namespace RpanList
             if (wfhRefreshDelay.Child != null)
             {
                 int newDelay = (int)(wfhRefreshDelay.Child as WinForms.NumericUpDown).Value;
-                if (periodicRefresh.IsEnabled) periodicRefresh.Stop();
+                if (periodicRefresh.IsEnabled)
+                {
+                    periodicRefresh.Stop();
+                }
+
                 periodicRefresh.Interval = TimeSpan.FromSeconds(newDelay);
                 periodicRefresh.Start();
                 conf.Default.refreshDelay = newDelay;
