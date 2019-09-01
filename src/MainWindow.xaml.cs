@@ -138,7 +138,6 @@ namespace RpanList
             else
             {
                 checkFailedAttempts();
-                failedAttempts++;
                 setTitle("RpanList - Couldn't connect");
                 tbRpanDownRefresh.Text = "Could not refresh";
                 Log(LogSeverity.Error, "Failed to connect to RPAN API: status: " + response.status);
