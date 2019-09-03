@@ -12,19 +12,14 @@ namespace RpanList.Classes
         {
             AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
         };
-        static HttpClient client;
+        static HttpClient client = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://strapi.reddit.com")
+        };
         static HttpResponseMessage response;
         public static async Task<ApiResponse> grabResponse()
         {
-            if (client == null)
-            {
-                client = new HttpClient(handler)
-                {
-                    BaseAddress = new Uri("https://strapi.reddit.com")
-                };
-                Log(LogSeverity.Debug, "Created new HttpClient");
-            }
-
+            client.CancelPendingRequests();
             try
             {
                 Log(LogSeverity.Debug, "Fetching RPAN API response...");
