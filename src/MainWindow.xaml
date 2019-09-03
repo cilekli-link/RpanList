@@ -85,7 +85,6 @@
                     <ScrollViewer Name="LogScroller" Margin="0,25,0,0">
                         <StackPanel Name="LogList" Margin="5,3,0,0">
                             <Grid Visibility="Collapsed">
-                                <Image Source="Icons\error.png" Width="18" Height="18" HorizontalAlignment="Left"/>
                                 <TextBlock Text="Everything died lol" HorizontalAlignment="Left" Margin="22,0,0,0"/>
                                 <TextBlock Text="This is a timestamp." HorizontalAlignment="Right" Margin="0,0,6,0"/>
                             </Grid>
@@ -127,6 +126,7 @@
             </StackPanel>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,113,0,0">
                 <TextBlock Text="Connectivity" Foreground="#FFFF9700" FontWeight="Bold" Margin="0,0,0,2" FontSize="14" HorizontalAlignment="Left"/>
+                <CheckBox IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=pauseRefreshIfDown}" Content="Pause auto-refresh if RPAN is down" Foreground="White" Margin="0,2,0,3"/>
                 <WrapPanel>
                     <TextBlock Text="Auto refresh delay" Foreground="White" Margin="0,2,10,0"/>
                     <WindowsFormsHost Name="wfhRefreshDelay" Height="22" Width="37">
@@ -135,7 +135,7 @@
                         </WindowsFormsHost.Child>
                     </WindowsFormsHost>
                 </WrapPanel>
-                <WrapPanel>
+                <WrapPanel Margin="0,3,0,0">
                     <TextBlock Text="Max auto-refresh attempts" Foreground="White" Margin="0,2,10,0"/>
                     <WindowsFormsHost Name="wfhMaxRefreshAttempts" Height="22" Width="37">
                         <WindowsFormsHost.Child>
@@ -144,7 +144,7 @@
                     </WindowsFormsHost>
                 </WrapPanel>
             </StackPanel>
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,180,0,0">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="358,50,0,0">
                 <TextBlock Text="Interface" Foreground="#FFFF9700" FontWeight="Bold" Margin="0,0,0,2" FontSize="14" HorizontalAlignment="Left"/>
                 <CheckBox Name="cbBorderless" Content="Borderless window" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=borderlessWindow}" Foreground="White" Checked="CbBorderless_Checked" Unchecked="CbBorderless_Checked"/>
                 <CheckBox Name="cbShowPan" Content="Show broken pan if RPAN is down" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=showBrokenPan}" Foreground="White" Checked="CbBorderless_Checked" Unchecked="CbBorderless_Checked" Margin="0,3,0,0"/>

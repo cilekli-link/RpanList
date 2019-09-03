@@ -105,6 +105,14 @@ namespace RpanList
                 {
                     setTitle("RpanList - RPAN is down");
                     Log(LogSeverity.Warning, "Connected, but RPAN is currently down (no streams)");
+                    if (conf.Default.pauseRefreshIfDown)
+                    {
+                        if (periodicRefresh.IsEnabled)
+                        {
+                            periodicRefresh.Stop();
+                            Log(LogSeverity.Warning, "RPAN is down, auto-refresh paused");
+                        }
+                    }
                     if (rpanDown.Visibility == Visibility.Visible) // if already in RpanError, update the header and rotate the pan
                     {
                         tbRpanDown.Text = "RPAN is still down";
@@ -163,10 +171,10 @@ namespace RpanList
             scroller.ScrollToVerticalOffset(vo);
             scroller.UpdateLayout();
             UpdateLayout();
-            setTitle("RpanList - " + streams.ToString() + " streams, " + views.ToString() + " viewers");
+            setTitle("RpanList - " + streams + " streams, " + views + " viewers");
         }
 
-        private void TbRefresh_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void TbRefresh_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (!isRefreshing)
             {
@@ -345,9 +353,9 @@ namespace RpanList
 
         private void wfhMaxRefreshAttempts_ValueChanged(object sender, EventArgs e)
         {
-            if (wfhRefreshDelay.Child != null)
+            if (wfhMaxRefreshAttempts.Child != null)
             {
-                int newValue = (int)(wfhRefreshDelay.Child as WinForms.NumericUpDown).Value;
+                int newValue = (int)(wfhMaxRefreshAttempts.Child as WinForms.NumericUpDown).Value;
                 conf.Default.maxRefreshAttempts = newValue;
             }
         }

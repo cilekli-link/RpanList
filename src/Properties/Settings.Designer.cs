@@ -94,5 +94,17 @@ namespace RpanList.Properties {
                 this["maxRefreshAttempts"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool pauseRefreshIfDown {
+            get {
+                return ((bool)(this["pauseRefreshIfDown"]));
+            }
+            set {
+                this["pauseRefreshIfDown"] = value;
+            }
+        }
     }
 }
