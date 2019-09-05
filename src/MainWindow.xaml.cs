@@ -69,8 +69,8 @@ namespace RpanList
             ApiResponse response = await RpanApi.grabResponse();
 
             if (response.status == "User ID is not found")
-                // reddit sometimes returns this. idk why, but it gets resolved if you retry a lot.
-                // that's what this for loop does
+            // reddit sometimes returns this. idk why, but it gets resolved if you retry a lot.
+            // that's what this for loop does
             {
                 for (int i = 0; i < 20; i++)
                 {
@@ -250,7 +250,7 @@ namespace RpanList
                     };
                     if (ofd.ShowDialog() == true && !string.IsNullOrWhiteSpace(ofd.FileName))
                     {
-                        tbYtdlPath.Text = conf.Default.ytdlPath;
+                        tbYtdlPath.Text = ofd.FileName;
                     }
                     break;
                 case BrowseType.Downloads:
@@ -260,7 +260,7 @@ namespace RpanList
                     };
                     if (fbd.ShowDialog() == WinForms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
-                        tbDownloadDir.Text = conf.Default.downloadDir;
+                        tbDownloadDir.Text = fbd.SelectedPath;
                     }
                     break;
                 default:

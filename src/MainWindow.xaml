@@ -98,8 +98,8 @@
             <StackPanel>
                 <Image Name="tbBrokenPan" Source="Icons\brokenPan.png" Height="150" Margin="0,30,0,0"/>
                 <TextBlock Name="tbRpanDown" Text="RPAN is down" FontSize="36" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,0"/>
-                <TextBlock Text="(API returned with success, but the stream list was empty)" FontSize="12" TextAlignment="Center" Margin="0,-4,0,-5"/>
-                <TextBlock Text="Please come back tomorrow." FontSize="20" TextAlignment="Center" Margin="0,5,0,0"/>
+                <!--<TextBlock Text="(API returned with success, but the stream list was empty)" FontSize="12" TextAlignment="Center" Margin="0,-4,0,-5"/>-->
+                <TextBlock Text="Please come back when broadcasting is available again." FontSize="16" TextAlignment="Center" Margin="0,-4,0,0"/>
                 <TextBlock Name="tbRpanDownRefresh" MouseLeftButtonUp="TbRefresh_MouseLeftButtonUp" Text="Refresh" FontSize="16" Foreground="#FF00AEFF" FontWeight="Bold" TextAlignment="Center" Margin="0,15,0,0"/>
                 <TextBlock Name="tbReturn" MouseLeftButtonUp="TbReturn_MouseLeftButtonUp"  Text="Ignore" FontSize="16" Foreground="#FFFF5100" FontWeight="Bold" TextAlignment="Center" Margin="0,10,0,0"/>
             </StackPanel>
