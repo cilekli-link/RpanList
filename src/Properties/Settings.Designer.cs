@@ -26,12 +26,12 @@ namespace RpanList.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ytdlPath {
+        public string ffmpegPath {
             get {
-                return ((string)(this["ytdlPath"]));
+                return ((string)(this["ffmpegPath"]));
             }
             set {
-                this["ytdlPath"] = value;
+                this["ffmpegPath"] = value;
             }
         }
         

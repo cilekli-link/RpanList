@@ -146,9 +146,9 @@
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,50,0,0">
                 <TextBlock Text="Paths" Foreground="#FFFF9700" FontWeight="Bold" Margin="0,0,0,2" FontSize="14" HorizontalAlignment="Left"/>
                 <WrapPanel>
-                    <TextBlock Text="Path to youtube-dl:" Foreground="White" Margin="0,0,10,0"/>
-                    <TextBox Text="{Binding Source={x:Static properties:Settings.Default}, Path=ytdlPath}"  Name="tbYtdlPath" Width="160" Margin="0,0,5,0"/>
-                    <Button Name="btnBrowseYtdl" Content="Browse" Width="55" Click="BtnBrowseYtdl_Click"/>
+                    <TextBlock Text="Path to ffmpeg:" Foreground="White" Margin="0,0,10,0"/>
+                    <TextBox Text="{Binding Source={x:Static properties:Settings.Default}, Path=ffmpegPath}"  Name="tbFfmpegPath" Width="160" Margin="0,0,5,0"/>
+                    <Button Name="btnBrowseFfmpeg" Content="Browse" Width="55" Click="BtnBrowseFfmpeg_Click"/>
                 </WrapPanel>
                 <WrapPanel>
                     <TextBlock Text="Downloads folder:" Foreground="White" Margin="0,0,16,0"/>

@@ -328,16 +328,16 @@ namespace RpanList
         {
             switch (type)
             {
-                case BrowseType.YoutubeDl:
+                case BrowseType.Ffmpeg:
                     OpenFileDialog ofd = new OpenFileDialog
                     {
-                        Title = "Open youtube-dl",
+                        Title = "Open ffmpeg",
                         Filter = "Application (*.exe)|*.exe|All files (*.*)|*.*"
                     };
                     if (ofd.ShowDialog() == true && !string.IsNullOrWhiteSpace(ofd.FileName))
                     {
-                        tbYtdlPath.Text = ofd.FileName;
-                        conf.Default.ytdlPath = ofd.FileName;
+                        tbFfmpegPath.Text = ofd.FileName;
+                        conf.Default.ffmpegPath = ofd.FileName;
                     }
                     break;
                 case BrowseType.Downloads:
@@ -358,13 +358,13 @@ namespace RpanList
 
         enum BrowseType
         {
-            YoutubeDl,
+            Ffmpeg,
             Downloads
         }
 
-        private void BtnBrowseYtdl_Click(object sender, RoutedEventArgs e)
+        private void BtnBrowseFfmpeg_Click(object sender, RoutedEventArgs e)
         {
-            openBrowse(BrowseType.YoutubeDl);
+            openBrowse(BrowseType.Ffmpeg);
         }
 
         private void BtnBrowseDownDir_Click(object sender, RoutedEventArgs e)

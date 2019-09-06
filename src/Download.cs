@@ -52,7 +52,7 @@ namespace RpanList
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    FileName = Properties.Settings.Default.ytdlPath,
+                    FileName = Properties.Settings.Default.ffmpegPath,
                     Arguments = args
                 }
             };
