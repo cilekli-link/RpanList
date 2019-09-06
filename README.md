@@ -10,4 +10,5 @@ Downloading requires [ffmpeg](https://ffmpeg.org/download.html). Extract it some
 - Desktop notifications (when RPAN is back, when a user starts streaming, when a download has ended, etc)
 - Opening the stream in a media player like VLC
 - Inline video player, similar to Redesign's Classic mode
+
 ...
