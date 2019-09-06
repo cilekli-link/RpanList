@@ -1,5 +1,5 @@
 # RpanList
-
+![A screenshot](https://raw.githubusercontent.com/cilekli-link/RpanList/master/screenshot.png)
 Lists current RPAN streams, and lets you download them or watch them on your browser.
 
 Downloading requires [ffmpeg](https://ffmpeg.org/download.html). Extract it somewhere, open RpanList, and set its path from the Settings panel.
