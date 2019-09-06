@@ -8,7 +8,7 @@
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
         Title="RpanList" Height="450" Width="700"
-        StateChanged="Window_StateChanged" Icon="Icons/rpanlist.ico">
+        StateChanged="Window_StateChanged" Closing="Window_Closing" Icon="Icons/rpanlist.ico">
     <Grid Name="MainGrid" Background="Black">
         <TabControl MouseDown="Tabs_MouseDown" Name="tabs" Margin="0,0,0,25" SelectionChanged="TabControl_SelectionChanged" Padding="0">
             <TabItem Name="tabStreams" Height="20">
@@ -19,7 +19,7 @@
                     </WrapPanel>
                 </TabItem.Header>
                 <Grid>
-                    <ScrollViewer Name="scroller" Margin="0">
+                    <ScrollViewer Name="scroller" Margin="0,22,0,0">
                         <StackPanel Name="StreamList" Background="Black" >
                             <Grid Visibility="Collapsed" Height="80" Background="#FF202020" Margin="10,10,10,5">
                                 <TextBox Width="70" HorizontalAlignment="Left" Margin="5"/>
@@ -50,18 +50,50 @@
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
-                    <TextBox Name="tbSearch" GotFocus="TbSearch_GotFocus" LostFocus="TbSearch_LostFocus" Grid.Column="0" FontSize="14" Height="22" Text="Search for streams..." VerticalAlignment="Top" Margin="0,0,17,0" Background="#7FFFFFFF" Foreground="White" SelectionBrush="White"/>
-                    <TextBlock Name="tbNoStreams" Text="There are no streams to display." Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
+                    <Grid VerticalAlignment="Top" Background="Black">
+                        <TextBox Name="tbSearch" GotFocus="TbSearch_GotFocus" LostFocus="TbSearch_LostFocus" Grid.Column="0" FontSize="14" Height="22" Text="Search for streams..." VerticalAlignment="Top" Margin="0,0,200,0" Background="#7FFFFFFF" Foreground="White" SelectionBrush="White"/>
+                        <TextBlock Text="Sort by" Foreground="White" HorizontalAlignment="Right" Margin="0,0,145,0" VerticalAlignment="Center"/>
+                        <ComboBox Name="cbSortBy" SelectionChanged="CbSortBy_SelectionChanged" SelectedIndex="4" Width="81" HorizontalAlignment="Right" Margin="0,0,58,0">
+                            <ComboBoxItem Content="Rank"/>
+                            <ComboBoxItem Content="Title"/>
+                            <ComboBoxItem Content="Upvotes"/>
+                            <ComboBoxItem Content="Downvotes"/>
+                            <ComboBoxItem Content="Net votes"/>
+                            <ComboBoxItem Content="Cont. viewers"/>
+                            <ComboBoxItem Content="Total views"/>
+                        </ComboBox>
+                        <CheckBox Name="cbSortDescending" Checked="CbSortDescending_Checked" Unchecked="CbSortDescending_Checked" ToolTip="Sort streams in descending order" IsChecked="True" Content="Desc." HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    </Grid>
+                    <TextBlock Name="tbNoStreams" Text="There are no streams to display." Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="0,20,0,0"/>
                 </Grid>
             </TabItem>
             <TabItem Name="tabRecent" Height="20" >
                 <TabItem.Header>
                     <WrapPanel>
                         <Image Width="18" Height="18" Source="Icons\recent.png"/>
-                        <TextBlock Text="Recent" Margin="5,0,0,0"/>
+                        <TextBlock Text="Recently Ended" Margin="5,0,0,0"/>
                     </WrapPanel>
                 </TabItem.Header>
-                <Grid Background="#FFE5E5E5"/>
+                <Grid>
+                    <ScrollViewer Name="endedScroller">
+                        <StackPanel Name="endedStreamList" Background="Black"/>
+                    </ScrollViewer>
+                    <!--<Grid VerticalAlignment="Top" Background="Black">
+                        <TextBox Name="tbEndedSearch" Grid.Column="0" FontSize="14" Height="22" Text="Search for streams..." VerticalAlignment="Top" Margin="0,0,200,0" Background="#7FFFFFFF" Foreground="White" SelectionBrush="White"/>
+                        <TextBlock Text="Sort by" Foreground="White" HorizontalAlignment="Right" Margin="0,0,145,0" VerticalAlignment="Center"/>
+                        <ComboBox Name="cbEndedSortBy" SelectedIndex="4" Width="81" HorizontalAlignment="Right" Margin="0,0,58,0">
+                            <ComboBoxItem Content="Rank"/>
+                            <ComboBoxItem Content="Title"/>
+                            <ComboBoxItem Content="Upvotes"/>
+                            <ComboBoxItem Content="Downvotes"/>
+                            <ComboBoxItem Content="Net votes"/>
+                            <ComboBoxItem Content="Cont. viewers"/>
+                            <ComboBoxItem Content="Total views"/>
+                        </ComboBox>
+                        <CheckBox Name="cbEndedSortDescending"  ToolTip="Sort streams in descending order" IsChecked="True" Content="Desc." HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    </Grid>
+                    <TextBlock Name="tbEndedNoStreams" Text="There are no streams to display." Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="0,20,0,0"/>-->
+                </Grid>
             </TabItem>
             <TabItem Name="tabLog" Height="20">
                 <TabItem.Header>
@@ -106,16 +138,16 @@
         </Grid>
         <Grid Name="settingsGrid" Visibility="Collapsed" Background="#F2181818" Height="300" VerticalAlignment="Bottom" >
             <TextBlock Text="Settings" Foreground="White" Margin="15,10,0,0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,11,0,0">
+            <!--<Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,11,0,0">
                 <Viewbox Width="24" Height="24" Child="{StaticResource icnSave}" Margin="0,0,49,0"/>
                 <TextBlock x:Name="tbSaveSettings" Foreground="#FF82FF76" Margin="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Top" Height="28" Text="Save"/>
                 <Grid Name="cmSaveSettings" MouseLeftButtonUp="CmSaveSettings_MouseLeftButtonUp" Background="#00000000" Margin="0"/>
-            </Grid>
+            </Grid>-->
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,50,0,0">
                 <TextBlock Text="Paths" Foreground="#FFFF9700" FontWeight="Bold" Margin="0,0,0,2" FontSize="14" HorizontalAlignment="Left"/>
                 <WrapPanel>
                     <TextBlock Text="Path to youtube-dl:" Foreground="White" Margin="0,0,10,0"/>
-                    <TextBox Text="{Binding Source={x:Static properties:Settings.Default}, Path=ytdlPath}" Name="tbYtdlPath" Width="160" Margin="0,0,5,0"/>
+                    <TextBox Text="{Binding Source={x:Static properties:Settings.Default}, Path=ytdlPath}"  Name="tbYtdlPath" Width="160" Margin="0,0,5,0"/>
                     <Button Name="btnBrowseYtdl" Content="Browse" Width="55" Click="BtnBrowseYtdl_Click"/>
                 </WrapPanel>
                 <WrapPanel>

@@ -10,7 +10,12 @@ namespace RpanList
 {
     class StreamView : Grid
     {
-        RpanData rpanData;
+        public event DownloadClickedEventHandler DownloadClicked;
+        public delegate void DownloadClickedEventHandler(StreamView sender, RpanData stream);
+
+        string lastSearchTerm;
+
+        public RpanData rpanData;
 
         FlatButton openRpan = new FlatButton("Open in RPAN", 80, @"Icons\open.png", Color.FromRgb(0, 50, 255));
         FlatButton openRpanMedia = new FlatButton("Open in r/pan_media", 137, @"Icons\link.png", Color.FromRgb(255, 100, 0));
@@ -19,22 +24,34 @@ namespace RpanList
         public void SearchTermChanged(object sender, TextChangedEventArgs e)
         {
             TextBox tb = sender as TextBox;
-            if (!string.IsNullOrWhiteSpace(tb.Text))
+            if (!string.IsNullOrWhiteSpace(tb.Text) && tb.Text != "Search for streams...")
             {
-                string term = tb.Text.ToLowerInvariant();
-                string title = rpanData.post.title.ToLowerInvariant();
-                string user = rpanData.post.authorInfo.name.ToLowerInvariant();
-                if (title.Contains(term) || user.Contains(term))
-                {
-                    Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    Visibility = Visibility.Collapsed;
-                }
+                lastSearchTerm = tb.Text;
+                checkSearchTerm(lastSearchTerm);
+            }
+            else
+            {
+                lastSearchTerm = "";
+                Visibility = Visibility.Visible;
             }
         }
-        public StreamView(RpanData data)
+
+        void checkSearchTerm(string searchTerm)
+        {
+            string term = searchTerm.ToLowerInvariant();
+            string title = rpanData.post.title.ToLowerInvariant();
+            string user = rpanData.post.authorInfo.name.ToLowerInvariant();
+            if (title.Contains(term) || user.Contains(term))
+            {
+                Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Visibility = Visibility.Collapsed;
+            }
+        }
+
+        public StreamView(RpanData data, string currentSearchTerm)
         {
             rpanData = data;
             #region UI elements
@@ -78,12 +95,12 @@ namespace RpanList
             TextBlock title = new TextBlock
             {
                 FontFamily = new FontFamily("Segoe UI"),
-                Text = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(data.post.title),
+                Text = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(data.post.title.ToLowerInvariant()),
                 Foreground = new SolidColorBrush(Colors.White),
                 Height = 25,
                 Margin = new Thickness(0, 0, 0, -5),
                 FontSize = 17,
-                FontWeight = FontWeights.Bold,
+                //FontWeight = FontWeights.Bold,
             };
 
             WrapPanel buttons = new WrapPanel();
@@ -102,7 +119,7 @@ namespace RpanList
 
             openRpan.Click += (s, a) => { Process.Start("https://reddit.com" + data.share_link); };
             openRpanMedia.Click += (s, a) => { Process.Start("https://reddit.com" + data.post.permalink); };
-            download.Click += (s, a) => { Process.Start(Properties.Settings.Default.ytdlPath, "-o \"" + Properties.Settings.Default.downloadDir + data.post.title + ".mp4\"" + " -f best " + data.stream.hls_url); };
+            download.Click += (s, a) => { DownloadClicked?.Invoke(this, data); };
 
             StackPanel votes = new StackPanel
             {
@@ -168,6 +185,12 @@ namespace RpanList
             Children.Add(img);
             Children.Add(info);
             Children.Add(votes);
+
+            if (!string.IsNullOrWhiteSpace(currentSearchTerm))
+            {
+                lastSearchTerm = currentSearchTerm;
+                checkSearchTerm(currentSearchTerm);
+            }
         }
 
         private void StreamView_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)

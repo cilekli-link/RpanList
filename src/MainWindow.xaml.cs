@@ -1,6 +1,9 @@
 ﻿using Microsoft.Win32;
 using RpanList.Classes;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +19,10 @@ namespace RpanList
 {
     public partial class MainWindow : Window
     {
+        Dictionary<string, Download> downloads = new Dictionary<string, Download>();
+        Dictionary<string, RpanData> streams = new Dictionary<string, RpanData>();
+        ApiResponse response;
+
         DispatcherTimer periodicRefresh = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
 
         bool isRefreshing;          // Set to true after clicking refresh on RpanDown grid
@@ -23,8 +30,8 @@ namespace RpanList
         double panRotation = 0;     // Rotation of broken pan in RpanDown grid
         double refreshRotation = 0; // Rotation of Refresh button
 
-        int streams = 0;
-        int views = 0;
+        int streamCount = 0;
+        int viewCount = 0;
         int failedAttempts = 0;
         int unreadLogs = 0;
 
@@ -66,7 +73,7 @@ namespace RpanList
 
         async Task parseResponse()
         {
-            ApiResponse response = await RpanApi.grabResponse();
+            response = await RpanApi.grabResponse();
 
             if (response.status == "User ID is not found")
             // reddit sometimes returns this. idk why, but it gets resolved if you retry a lot.
@@ -75,7 +82,7 @@ namespace RpanList
                 for (int i = 0; i < 20; i++)
                 {
                     Log(LogSeverity.Warning, "Could not connect - retrying (" + i + " of 20)");
-                    await Task.Delay(1000); // let the API rest (?)
+                    await Task.Delay(4000); // let the API rest (?)
                     response = await RpanApi.grabResponse();
                     if (response.status == "User ID is not found")
                     {
@@ -130,7 +137,7 @@ namespace RpanList
                 else // there is at least one stream to display
                 {
                     failedAttempts = 0;
-                    Log(LogSeverity.Info, "Connected, listing streams.");
+                    //Log(LogSeverity.Info, "Connected, listing streams.");
                     setTitle("RpanList - Listing streams...");
                     tbRpanDownRefresh.Text = "Listing streams...";
                     tbNoStreams.Visibility = Visibility.Hidden;
@@ -155,23 +162,102 @@ namespace RpanList
 
         void listStreams(ApiResponse response)
         {
+            StreamView sw;
             double vo = scroller.VerticalOffset;
+
+            sortList(response);
+            if (cbSortDescending.IsChecked == true) response.data.Reverse();
             StreamList.Children.Clear();
-            streams = 0;
-            views = 0;
+            streamCount = 0;
+            viewCount = 0;
             foreach (RpanData data in response.data)
             {
-                streams++;
-                views = views + data.continuous_watchers;
-                StreamView sw = new StreamView(data);
+                streamCount++;
+                viewCount += data.continuous_watchers;
+                if (!string.IsNullOrWhiteSpace(tbSearch.Text) && tbSearch.Text != "Search for streams...")
+                {
+                    sw = new StreamView(data, tbSearch.Text);
+                }
+                else
+                {
+                    sw = new StreamView(data, "");
+                }
+                sw.DownloadClicked += Sw_DownloadClicked;
                 tbSearch.TextChanged += sw.SearchTermChanged;
                 StreamList.Children.Add(sw);
             }
-            Log(LogSeverity.Info, "Listed " + streams + " streams.");
+            Log(LogSeverity.Info, "Listed " + streamCount + " streams.");
             scroller.ScrollToVerticalOffset(vo);
             scroller.UpdateLayout();
             UpdateLayout();
-            setTitle("RpanList - " + streams + " streams, " + views + " viewers");
+            setTitle("RpanList - " + streamCount + " streams, " + viewCount + " viewers");
+            updateRecents(response);
+        }
+
+        private void Sw_DownloadClicked(StreamView sender, RpanData data)
+        {
+            Download dl = new Download(data);
+            dl.DownloadEnded += Dl_DownloadEnded;
+            downloads.Add(data.stream.stream_id, dl);
+            tabs.Items.Add(dl.tab);
+        }
+
+        private void Dl_DownloadEnded(object sender, EventArgs e)
+        {
+            downloads.Remove((sender as Download).data.stream.stream_id);
+        }
+
+        private void updateRecents(ApiResponse response)
+        {
+            Dictionary<string, RpanData> newDict = new Dictionary<string, RpanData>();
+            foreach (RpanData data in response.data)
+            {
+                if (!newDict.ContainsKey(data.stream.stream_id))
+                {
+                    newDict.Add(data.stream.stream_id, data);
+                }
+                if (streams.ContainsKey(data.stream.stream_id))
+                {
+                    streams[data.stream.stream_id] = data;
+                }
+            }
+            // Streams from newDict that aren't in the streams dictionary
+            Dictionary<string, RpanData> newStreams = newDict
+                .Where(kvp => !streams.ContainsKey(kvp.Key))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            // Streams from newDict that already are in the streams directory
+            Dictionary<string, RpanData> oldStreams = newDict
+                .Where(kvp => streams.ContainsKey(kvp.Key))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            // Streams from the stream directory that aren't in newDict
+            Dictionary<string, RpanData> goneStreams = streams
+                .Where(kvp => !newDict.ContainsKey(kvp.Key))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            foreach (KeyValuePair<string, RpanData> stream in newStreams)
+            {
+                streams.Add(stream.Key, stream.Value);
+                Log(LogSeverity.Debug, "New stream: " + stream.Value.post.title);
+            }
+
+            foreach (KeyValuePair<string, RpanData> stream in goneStreams)
+            {
+                streams.Remove(stream.Key);
+                Log(LogSeverity.Debug, "Stream ended: " + stream.Value.post.title);
+                //tbEndedNoStreams.Visibility = Visibility.Collapsed;
+                //if (tbEndedSearch.Text != "Search for streams...")
+                //{
+                //    endedStreamList.Children.Add(new StreamView(stream.Value, tbEndedSearch.Text));
+                //}
+                //else
+                //{
+                    endedStreamList.Children.Add(new StreamView(stream.Value, ""));
+                //}
+            }
+
+
         }
 
         private void TbRefresh_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -251,6 +337,7 @@ namespace RpanList
                     if (ofd.ShowDialog() == true && !string.IsNullOrWhiteSpace(ofd.FileName))
                     {
                         tbYtdlPath.Text = ofd.FileName;
+                        conf.Default.ytdlPath = ofd.FileName;
                     }
                     break;
                 case BrowseType.Downloads:
@@ -261,6 +348,7 @@ namespace RpanList
                     if (fbd.ShowDialog() == WinForms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
                         tbDownloadDir.Text = fbd.SelectedPath;
+                        conf.Default.downloadDir = fbd.SelectedPath;
                     }
                     break;
                 default:
@@ -446,10 +534,58 @@ namespace RpanList
             }
         }
 
-        private void CmSaveSettings_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void CbSortBy_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            conf.Default.Save();
-            settingsGrid.Visibility = Visibility.Collapsed;
+            if (response?.data?.Count > 0)
+            {
+                listStreams(response);
+            }
+        }
+
+        private void CbSortDescending_Checked(object sender, RoutedEventArgs e)
+        {
+            if (response?.data?.Count > 0)
+            {
+                listStreams(response);
+            }
+        }
+
+        void sortList(ApiResponse response)
+        {
+            switch (cbSortBy.SelectedIndex)
+            {
+                case 0:
+                    response.data.Sort((x, y) => x.rank.CompareTo(y.rank));
+                    break;
+                case 1:
+                    response.data.Sort((x, y) => x.post.title.CompareTo(y.post.title));
+                    break;
+                case 2:
+                    response.data.Sort((x, y) => x.upvotes.CompareTo(y.upvotes));
+                    break;
+                case 3:
+                    response.data.Sort((x, y) => x.downvotes.CompareTo(y.downvotes));
+                    break;
+                case 4:
+                    response.data.Sort((x, y) => (x.upvotes - x.downvotes).CompareTo((y.upvotes - y.downvotes)));
+                    break;
+                case 5:
+                    response.data.Sort((x, y) => x.continuous_watchers.CompareTo(y.continuous_watchers));
+                    break;
+                case 6:
+                    response.data.Sort((x, y) => x.unique_watchers.CompareTo(y.unique_watchers));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            foreach (Download dl in downloads.Values)
+            {
+                dl.EndDownload();
+            }
         }
     }
 }

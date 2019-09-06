@@ -5,8 +5,8 @@ using System.Windows;
 // Bir bütünleştirilmiş koda ilişkin Genel Bilgiler aşağıdaki öznitelikler kümesiyle
 // denetlenir. Bütünleştirilmiş kod ile ilişkili bilgileri değiştirmek için
 // bu öznitelik değerlerini değiştirin.
-[assembly: AssemblyTitle("Lists all current Reddit Public Access Network (RPAN) streams")]
-[assembly: AssemblyDescription("RpanList")]
+[assembly: AssemblyTitle("RpanList")]
+[assembly: AssemblyDescription("Lists all current Reddit Public Access Network (RPAN) streams")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("cilekli-link")]
 [assembly: AssemblyProduct("RpanList")]
